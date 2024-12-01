@@ -47,7 +47,8 @@ async def get_cos_images(bot: Bot, ev: Event):
                     cos = item
                     break
             logger.info(f"目录地址：{cos[1]}")
-            await bot.send(get_cos(cos[0], cos[1]))
+            await get_cos(cos[0], cos[1])
+            await bot.send("完成")
         except:
             await bot.send('输入错误')
 
