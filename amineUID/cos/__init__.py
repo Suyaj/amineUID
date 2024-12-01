@@ -1,4 +1,6 @@
 """ cos命令 """
+import os
+
 from PIL import Image
 
 from gsuid_core.sv import SV
@@ -8,6 +10,7 @@ from gsuid_core.logger import logger
 from gsuid_core.utils.image.convert import convert_img
 
 from .cos_core import get_cos_list, get_cos
+from ..utils.contants import IMAGES_PATH
 
 sv_am_get_cos_images = SV("cosPlay")
 
@@ -51,8 +54,9 @@ async def get_cos_images(bot: Bot, ev: Event):
 
 @sv_am_get_cos_images.on_fullmatch("test")
 async def get_cos_images(bot: Bot, ev: Event):
+    img_dir = os.path.join(IMAGES_PATH, "【COS正片】碧蓝航线 柴郡猫性感女仆cos cn香草喵露露")
     image_open = Image.open(
-        "D:/projects/gsuid_core/data/amineUID/images/【COS正片】碧蓝航线 柴郡猫性感女仆cos cn香草喵露露/0c932ae2f40e687a7ae5fa5ab119609a.jpg")
+        os.path.join(img_dir, "/0c932ae2f40e687a7ae5fa5ab119609a.jpg"))
     img = await convert_img(image_open)
     msgs = [img, img]
     await bot.send(msgs)
