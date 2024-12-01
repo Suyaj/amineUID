@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "migan-rss"
+version = "0.1.0"
+description = "MiGan Rss 订阅工具"
+authors = ["Suwanyad"]
+license = "GPL-3.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+beautifulsoup4 = "^4.12.3"
+gsuid-core = "^0.5.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
