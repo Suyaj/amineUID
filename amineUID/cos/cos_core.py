@@ -48,7 +48,7 @@ def get_cos_list(index: str = None):
         data[title] = href
     return data
 
-def get_cos(title: str, href: str):
+async def get_cos(title: str, href: str):
     """
     下载cos目录
 
@@ -62,8 +62,8 @@ def get_cos(title: str, href: str):
     if title in images:
         return get_images(Path(img_dir))
     os.makedirs(img_dir, exist_ok=True)
-    download_one_cos(url, img_dir, title)
-    return get_images(Path(img_dir))
+    await download_one_cos(url, img_dir, title)
+    # return get_images(Path(img_dir))
 
 
 def get_images(path: Path) -> list[Image.Image]:
@@ -86,7 +86,7 @@ def get_images(path: Path) -> list[Image.Image]:
 
 
 
-def download_one_cos(url: str, img_dir: str, title: str):
+async def download_one_cos(url: str, img_dir: str, title: str):
     """
     下载
 
@@ -111,7 +111,7 @@ def download_one_cos(url: str, img_dir: str, title: str):
         img_urls = os.path.split(img_src)
         file_name = img_urls[len(img_urls) - 1]
         file_url = COS_BASE + img_src
-        asyncio.run(download_img(file_url, Path(img_dir), file_name))
+        await download_img(file_url, Path(img_dir), file_name)
     logger.info(f'{title} 下载完成')
 
 
