@@ -59,6 +59,6 @@ async def get_cos_images(bot: Bot, ev: Event):
     img_dir = os.path.join(IMAGES_PATH, "【COS正片】碧蓝航线 柴郡猫性感女仆cos cn香草喵露露")
     image_open = Image.open(
         os.path.join(img_dir, "0c932ae2f40e687a7ae5fa5ab119609a.jpg"))
-    img = await convert_img(image_open)
-    msgs = [Message(img), Message(img)]
+    img = await convert_img(image_open, True)
+    msgs = [img, img]
     await bot.send(msgs)
