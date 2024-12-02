@@ -62,7 +62,7 @@ async def get_cos(title: str, href: str):
     images = os.listdir(IMAGES_PATH)
     img_dir = os.path.join(IMAGES_PATH, title)
     if title in images:
-        return get_images(Path(img_dir))
+        return await get_images(Path(img_dir))
     os.makedirs(img_dir, exist_ok=True)
     await download_one_cos(url, img_dir, title)
     return await get_images(Path(img_dir))
