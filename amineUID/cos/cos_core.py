@@ -65,7 +65,7 @@ async def get_cos(title: str, href: str):
         return get_images(Path(img_dir))
     os.makedirs(img_dir, exist_ok=True)
     await download_one_cos(url, img_dir, title)
-    return get_images(Path(img_dir))
+    return await get_images(Path(img_dir))
 
 
 async def get_images(path: Path) -> list[bytes]:
