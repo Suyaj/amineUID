@@ -1,11 +1,9 @@
 """ cos core """
-
-import os
 import asyncio
+import os
 import urllib.request
 from time import sleep
 from pathlib import Path
-from typing import List
 
 from PIL import Image
 from bs4 import BeautifulSoup
@@ -27,9 +25,10 @@ def get_cos_list(index: str = None):
     data = {}
     start_url = (
         COSPLAY_URL
-        if index is None or index == "1"
+        if index is None or index == "1" or index == ""
         else COSPLAY_URL + "/" + f"index_{index}.html"
     )
+    logger.info(f"[cosplay] start地址：{start_url}")
     urlopen = urllib.request.urlopen(start_url)
     html = urlopen.read()
     html_soup = BeautifulSoup(html, "html.parser")
@@ -49,6 +48,11 @@ def get_cos_list(index: str = None):
         title = img.get("alt")
         data[title] = href
     return data
+
+
+def async_get_cos(title: str, href: str):
+    asyncio.run(get_cos(title, href))
+
 
 async def get_cos(title: str, href: str):
     """
@@ -85,7 +89,6 @@ async def get_images(path: Path) -> list[bytes]:
         img = Image.open(img_path)
         data.append(await convert_img(img, True))
     return data
-
 
 
 async def download_one_cos(url: str, img_dir: str, title: str):
