@@ -5,12 +5,14 @@ import asyncio
 import urllib.request
 from time import sleep
 from pathlib import Path
+from typing import List
 
 from PIL import Image
 from bs4 import BeautifulSoup
 
 from gsuid_core.logger import logger
 from gsuid_core.utils.download_resource.download_file import download
+from gsuid_core.utils.image.convert import convert_img
 
 from ..utils.contants import COS_BASE, COSPLAY_URL, IMAGES_PATH
 
@@ -63,10 +65,10 @@ async def get_cos(title: str, href: str):
         return get_images(Path(img_dir))
     os.makedirs(img_dir, exist_ok=True)
     await download_one_cos(url, img_dir, title)
-    # return get_images(Path(img_dir))
+    return get_images(Path(img_dir))
 
 
-def get_images(path: Path) -> list[Image.Image]:
+async def get_images(path: Path) -> list[bytes]:
     """
     获取图片
 
@@ -81,7 +83,7 @@ def get_images(path: Path) -> list[Image.Image]:
     for image in images:
         img_path = Path.joinpath(path, image)
         img = Image.open(img_path)
-        data.append(img)
+        data.append(await convert_img(img, True))
     return data
 
 

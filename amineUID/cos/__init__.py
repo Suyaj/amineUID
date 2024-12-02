@@ -47,8 +47,8 @@ async def get_cos_images(bot: Bot, ev: Event):
                     cos = item
                     break
             logger.info(f"目录地址：{cos[1]}")
-            await get_cos(cos[0], cos[1])
-            await bot.send("完成")
+            images = await get_cos(cos[0], cos[1])
+            await bot.send(images)
         except Exception as e:
             logger.error(e)
             await bot.send('输入错误')
@@ -56,9 +56,4 @@ async def get_cos_images(bot: Bot, ev: Event):
 
 @sv_am_get_cos_images.on_fullmatch("test")
 async def get_cos_images(bot: Bot, ev: Event):
-    img_dir = os.path.join(IMAGES_PATH, "【COS正片】碧蓝航线 柴郡猫性感女仆cos cn香草喵露露")
-    image_open = Image.open(
-        os.path.join(img_dir, "0c932ae2f40e687a7ae5fa5ab119609a.jpg"))
-    img = await convert_img(image_open, True)
-    msgs = [img, img]
-    await bot.send(msgs)
+    await bot.send("test")
