@@ -1,5 +1,4 @@
 """ cos命令 """
-import asyncio
 import os
 import random
 from concurrent.futures import ThreadPoolExecutor, wait
@@ -10,8 +9,8 @@ from gsuid_core.bot import Bot
 from gsuid_core.models import Event, Message
 from gsuid_core.logger import logger
 
-from .cos_core import get_cos_list, get_cos, get_images, async_get_cos
-from ..utils import IMAGES_PATH
+from gsuid_core.plugins.amineUID.amineUID.cos.cos_core import get_cos_list, get_cos, get_images, async_get_cos
+from gsuid_core.plugins.amineUID.amineUID.utils import IMAGES_PATH
 
 sv_am_get_cos_images = SV("cosPlay")
 

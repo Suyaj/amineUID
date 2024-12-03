@@ -11,3 +11,7 @@ IMAGES_PATH = Path.joinpath(MAIN_PATH, "images")
 # cos
 COS_BASE = "https://a2cy.com"
 COSPLAY_URL = "https://a2cy.com/acg/cos"
+
+# wiki
+WIKI_URL = "https://homdgcat.wiki/gi"
+WIKI_CHANGE_URL = "https://homdgcat.wiki/gi/change"

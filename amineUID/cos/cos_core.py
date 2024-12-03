@@ -12,7 +12,7 @@ from gsuid_core.logger import logger
 from gsuid_core.utils.download_resource.download_file import download
 from gsuid_core.utils.image.convert import convert_img
 
-from ..utils.contants import COS_BASE, COSPLAY_URL, IMAGES_PATH
+from gsuid_core.plugins.amineUID.amineUID.utils.contants import COS_BASE, COSPLAY_URL, IMAGES_PATH
 
 
 def get_cos_list(index: str = None):
