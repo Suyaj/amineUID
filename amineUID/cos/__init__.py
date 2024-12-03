@@ -35,10 +35,11 @@ async def get_cos_images(bot: Bot, ev: Event):
     if len(cmds) == 0:
         data = os.listdir(IMAGES_PATH)
         if len(data) == 0:
-            return await bot.send("本地无数据")
+            return bot.send("本地无数据")
         i = random.randint(0, len(data) - 1)
         img_dir = os.path.join(IMAGES_PATH, data[i])
-        return await bot.send(await get_images(Path(img_dir)))
+        images = await get_images(Path(img_dir))
+        return bot.send(images)
     await bot.send('正在获取目录，请稍等')
     if "local" in cmds:
         data = os.listdir(IMAGES_PATH)
