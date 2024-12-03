@@ -91,7 +91,7 @@ async def get_cos_images(bot: Bot, ev: Event):
     i = random.randint(0, len(data) - 1)
     img_dir = os.path.join(IMAGES_PATH, data[i])
     images = await get_images(Path(img_dir))
-    return bot.send(images)
+    await bot.send(images)
 
 def convert_cmd(text: str) -> dict[str, str]:
     cmd = {}
