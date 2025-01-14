@@ -8,7 +8,7 @@ from gsuid_core.config import core_config
 import plugins.amineUID.amineUID.cos as cos
 
 
-@scheduler.scheduled_job('interval', seconds=10)
+@scheduler.scheduled_job('cron', hour=0)
 async def get_cos_job():
     logger.info("开始刷新cos列表")
     cos_list = cos.get_cos_list()
