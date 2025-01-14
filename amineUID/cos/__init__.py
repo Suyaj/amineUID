@@ -82,6 +82,7 @@ async def get_cos_images(bot: Bot, ev: Event):
             logger.error(e)
             await bot.send('输入错误')
 
+
 @sv_am_get_cos_images.on_fullmatch("获取图片")
 async def get_cos_images(bot: Bot, ev: Event):
     data = os.listdir(IMAGES_PATH)
@@ -91,6 +92,7 @@ async def get_cos_images(bot: Bot, ev: Event):
     img_dir = os.path.join(IMAGES_PATH, data[i])
     images = await get_images(Path(img_dir))
     await bot.send(images)
+
 
 def convert_cmd(text: str) -> dict[str, str]:
     cmd = {}
