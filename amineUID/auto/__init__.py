@@ -1,14 +1,13 @@
 import os
 from concurrent.futures.thread import ThreadPoolExecutor
 
-from gsuid_core.aps import scheduler
 from gsuid_core.gss import gss
 from gsuid_core.logger import logger
 from gsuid_core.config import core_config
-import plugins.amineUID.amineUID.cos as cos
+import gsuid_core.plugins.amineUID.amineUID.cos as cos
 
 
-@scheduler.scheduled_job('cron', hour=0)
+# @scheduler.scheduled_job('cron', hour=0)
 async def get_cos_job():
     logger.info("开始刷新cos列表")
     cos_list = cos.get_cos_list()

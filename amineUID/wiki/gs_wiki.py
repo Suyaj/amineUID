@@ -66,9 +66,11 @@ def get_text():
     option.add_argument('--proxy-server=http://{}:{}'.format(proxy_ip, proxy_port))
     driver = webdriver.Chrome(options=option)
     driver.get(host)
+    time.sleep(1)
     WebDriverWait(driver, time_out).until(
         ec.presence_of_element_located((By.XPATH, '/html'))
     )
+    time.sleep(1)
     page_source = driver.page_source
     html = BeautifulSoup(page_source, 'html.parser')
     gs = html.find("section", {"class": "n1"})
