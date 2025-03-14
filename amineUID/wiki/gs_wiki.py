@@ -22,7 +22,7 @@ proxy.http_proxy = f"{proxy_ip}:{proxy_port}"
 proxy.ssl_proxy = f"{proxy_ip}:{proxy_port}"
 
 
-def screen_shot(url: str, div_id: str, element: str):
+def screen_shot(url: str, div_id: str | None, element: str | None, script_state: str | None):
     request_url = host + url
     option = webdriver.ChromeOptions()
     option.add_argument('headless')
@@ -36,14 +36,21 @@ def screen_shot(url: str, div_id: str, element: str):
     try:
         driver.get(request_url)
         WebDriverWait(driver, time_out).until(
-            ec.presence_of_element_located((By.CSS_SELECTOR, '.gacha.dissolve'))
+            ec.presence_of_element_located((By.XPATH, '/html'))
         )
-        ready_state = driver.execute_script(
-            "return document.getElementById('{}').getElementsByClassName('{}')[0].complete;".format(div_id, element))
-        while not ready_state:
+        if script_state is not None:
+            ready_state = driver.execute_script(script_state)
+        else:
             ready_state = driver.execute_script(
                 "return document.getElementById('{}').getElementsByClassName('{}')[0].complete;"
                 .format(div_id, element))
+        while not ready_state:
+            if script_state is not None:
+                ready_state = driver.execute_script(script_state);
+            else:
+                ready_state = driver.execute_script(
+                    "return document.getElementById('{}').getElementsByClassName('{}')[0].complete;"
+                    .format(div_id, element))
         time.sleep(1)
         r_node = driver.find_element(By.CSS_SELECTOR, value='.a_data')
         # 将浏览器的宽高设置成刚刚获取的宽高
@@ -58,13 +65,22 @@ def screen_shot(url: str, div_id: str, element: str):
         driver.close()
 
 
-def get_text():
+def get_future():
+    screen_shot(host, None, None, '')
+
+
+def get_driver():
     option = webdriver.ChromeOptions()
     option.add_argument('headless')
     option.add_argument('--no-sandbox')
     option.add_argument('--disable-gpu')
     option.add_argument('--proxy-server=http://{}:{}'.format(proxy_ip, proxy_port))
     driver = webdriver.Chrome(options=option)
+    return driver
+
+
+def get_text():
+    driver = get_driver()
     driver.get(host)
     time.sleep(1)
     WebDriverWait(driver, time_out).until(
@@ -88,12 +104,14 @@ def get_text_list(html):
         text_list.append(p.get_text())
     return text_list
 
+
 def get_url(html, target):
     a_list = html.find_all("a", {"target": "_blank"})
     for a in a_list:
         p = a.find_next("p", {"class": "new_text"})
         if p.get_text() == target:
-           return a.get_attribute("href")
+            return a.get_attribute("href")
+
 
 # screen_shot('/gi/char/Varesa', 'special', 'gacha dissolve')
 url = get_text()
