@@ -121,6 +121,7 @@ def get_driver():
     option.add_argument('--no-sandbox')
     option.add_argument('--disable-gpu')
     option.add_argument('--proxy-server=http://{}:{}'.format(proxy_ip, proxy_port))
+    option.add_argument('--user-data-dir=./user_data')
     driver_path = ChromeDriverManager().install()
     service = Service(driver_path=driver_path, options=option)
     driver = webdriver.Chrome(service=service)
