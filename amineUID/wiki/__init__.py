@@ -1,3 +1,5 @@
+from webdriver_manager.chrome import ChromeDriverManager
+
 from gsuid_core.plugins.amineUID.amineUID.wiki.gs_wiki import get_future
 from gsuid_core.plugins.WutheringWavesUID.WutheringWavesUID.wutheringwaves_newsign import do_sign_task
 from gsuid_core.plugins.ZZZeroUID.ZZZeroUID.utils.hint import BIND_UID_HINT
@@ -10,6 +12,8 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.sign.sign import sign_in
 
 sv_wiki = SV("wiki")
+driver_path = ChromeDriverManager().install()
+logger.info("驱动地址：", driver_path)
 
 @sv_wiki.on_fullmatch("全部签到")
 async def get_all_sign_func(bot: Bot, ev: Event):

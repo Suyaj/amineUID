@@ -3,13 +3,11 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.proxy import Proxy, ProxyType
 from selenium.webdriver.support.wait import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 
 from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
-
 
 from gsuid_core.logger import logger
 
@@ -27,7 +25,6 @@ proxy = Proxy()
 proxy.proxy_type = ProxyType.MANUAL
 proxy.http_proxy = f"{proxy_ip}:{proxy_port}"
 proxy.ssl_proxy = f"{proxy_ip}:{proxy_port}"
-driver_path = ChromeDriverManager().install()
 
 
 def screen_shot(url: str, div_id: str | None, element: str | None, wait_xpath: str, script_state: str | None,
@@ -86,7 +83,7 @@ def get_future(_type: str):
             ready_state = driver.execute_script(
                 "let images = document.getElementsByClassName('n1')[0].getElementsByTagName('img');for (let image of images) {  if(!image.complete){    return false;  }}return true;")
         time.sleep(1)
-        if _type!= 'gs':
+        if _type != 'gs':
             driver.find_element(By.XPATH, '/html/body/container/div/section[1]/schedule[2]').click()
         html = driver.find_element(By.CSS_SELECTOR, 'container')
         # 将浏览器的宽高设置最大
