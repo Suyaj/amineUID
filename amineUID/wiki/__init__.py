@@ -1,3 +1,4 @@
+from amineUID.wiki.gs_wiki import get_future
 from gsuid_core.plugins.WutheringWavesUID.WutheringWavesUID.wutheringwaves_newsign import do_sign_task
 from gsuid_core.plugins.ZZZeroUID.ZZZeroUID.utils.hint import BIND_UID_HINT
 from gsuid_core.sv import SV
@@ -5,6 +6,7 @@ from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 from gsuid_core.logger import logger
 from gsuid_core.utils.database.models import GsBind
+from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.sign.sign import sign_in
 
 sv_wiki = SV("wiki")
@@ -30,3 +32,12 @@ async def get_all_sign_func(bot: Bot, ev: Event):
     # ww签到
     msg = await do_sign_task(bot, ev)
     await bot.send(msg)
+
+@sv_wiki.on_prefix('未来信息')
+async def get_future_func(bot: Bot, ev: Event):
+    texts = ev.text.strip().split(" ")
+    _type = 'gs' if texts[0] == '原神' else 'sr'
+    future = get_future(_type)
+    image = await convert_img(future, True)
+    await bot.send(image)
+
