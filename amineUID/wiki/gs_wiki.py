@@ -1,7 +1,9 @@
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.proxy import Proxy, ProxyType
 from selenium.webdriver.support.wait import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 
 from bs4 import BeautifulSoup
@@ -25,6 +27,7 @@ proxy = Proxy()
 proxy.proxy_type = ProxyType.MANUAL
 proxy.http_proxy = f"{proxy_ip}:{proxy_port}"
 proxy.ssl_proxy = f"{proxy_ip}:{proxy_port}"
+driver_path = ChromeDriverManager().install()
 
 
 def screen_shot(url: str, div_id: str | None, element: str | None, wait_xpath: str, script_state: str | None,
@@ -90,9 +93,7 @@ def get_future(_type: str):
         driver.set_window_size(html.size['width'], html.size['height'])
         time.sleep(1)
         r_node = driver.find_element(By.XPATH, value=r_node_target)
-        path = get_temp_file()
         _base64 = r_node.screenshot_as_base64
-        r_node.screenshot(path)  # 得到整个网页的完整截图
         elements = r_node.find_elements(By.CSS_SELECTOR, 'a')
         size = len(elements)
         _width = elements[0].size['width']
@@ -117,11 +118,12 @@ def get_temp_file():
 
 def get_driver():
     option = webdriver.ChromeOptions()
-    # option.add_argument('headless')
+    option.add_argument('headless')
     option.add_argument('--no-sandbox')
     option.add_argument('--disable-gpu')
     option.add_argument('--proxy-server=http://{}:{}'.format(proxy_ip, proxy_port))
-    driver = webdriver.Chrome(options=option)
+    service = Service(driver_path=driver_path, options=option)
+    driver = webdriver.Chrome(service=service)
     driver.implicitly_wait(20)
     driver.maximize_window()
     return driver
