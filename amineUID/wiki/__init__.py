@@ -12,6 +12,9 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.sign.sign import sign_in
 
 sv_wiki = SV("wiki")
+driver_path = ChromeDriverManager().install()
+logger.info("驱动地址：", driver_path)
+
 
 @sv_wiki.on_fullmatch("全部签到")
 async def get_all_sign_func(bot: Bot, ev: Event):
@@ -35,6 +38,7 @@ async def get_all_sign_func(bot: Bot, ev: Event):
     msg = await do_sign_task(bot, ev)
     await bot.send(msg)
 
+
 @sv_wiki.on_prefix('未来信息')
 async def get_future_func(bot: Bot, ev: Event):
     texts = ev.text.strip().split(" ")
@@ -42,4 +46,3 @@ async def get_future_func(bot: Bot, ev: Event):
     future = get_future(_type)
     image = await convert_img(future, True)
     await bot.send(image)
-
