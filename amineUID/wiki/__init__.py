@@ -1,4 +1,4 @@
-from amineUID.wiki.gs_wiki import get_future
+from gsuid_core.plugins.amineUID.amineUID.wiki.gs_wiki import get_future
 from gsuid_core.plugins.WutheringWavesUID.WutheringWavesUID.wutheringwaves_newsign import do_sign_task
 from gsuid_core.plugins.ZZZeroUID.ZZZeroUID.utils.hint import BIND_UID_HINT
 from gsuid_core.sv import SV
