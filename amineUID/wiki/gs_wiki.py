@@ -9,6 +9,8 @@ from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
 
+from webdriver_manager.chrome import ChromeDriverManager
+
 from gsuid_core.logger import logger
 
 import time
@@ -25,7 +27,7 @@ proxy = Proxy()
 proxy.proxy_type = ProxyType.MANUAL
 proxy.http_proxy = f"{proxy_ip}:{proxy_port}"
 proxy.ssl_proxy = f"{proxy_ip}:{proxy_port}"
-driver_path = ''
+
 
 def screen_shot(url: str, div_id: str | None, element: str | None, wait_xpath: str, script_state: str | None,
                 node_xpath: str):
@@ -119,6 +121,7 @@ def get_driver():
     option.add_argument('--no-sandbox')
     option.add_argument('--disable-gpu')
     option.add_argument('--proxy-server=http://{}:{}'.format(proxy_ip, proxy_port))
+    driver_path = ChromeDriverManager().install()
     service = Service(driver_path=driver_path, options=option)
     driver = webdriver.Chrome(service=service)
     driver.implicitly_wait(20)
