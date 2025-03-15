@@ -12,8 +12,8 @@ from gsuid_core.utils.image.convert import convert_img
 from gsuid_core.utils.sign.sign import sign_in
 
 sv_wiki = SV("wiki")
-driver_path = ChromeDriverManager().install()
-logger.info("驱动地址：", driver_path)
+gs_wiki.driver_path = ChromeDriverManager().install()
+logger.info("驱动地址：", gs_wiki.driver_path)
 
 @sv_wiki.on_fullmatch("全部签到")
 async def get_all_sign_func(bot: Bot, ev: Event):

@@ -25,7 +25,7 @@ proxy = Proxy()
 proxy.proxy_type = ProxyType.MANUAL
 proxy.http_proxy = f"{proxy_ip}:{proxy_port}"
 proxy.ssl_proxy = f"{proxy_ip}:{proxy_port}"
-
+driver_path = ''
 
 def screen_shot(url: str, div_id: str | None, element: str | None, wait_xpath: str, script_state: str | None,
                 node_xpath: str):
