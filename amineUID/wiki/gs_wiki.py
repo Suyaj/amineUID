@@ -130,7 +130,6 @@ def get_driver():
     service = Service(executable_path=driver_path, options=option)
     driver = webdriver.Chrome(options=option, service=service)
     driver.implicitly_wait(20)
-    driver.maximize_window()
     return driver, user_data_dir
 
 
