@@ -1,6 +1,3 @@
-import os
-import tempfile
-
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
@@ -35,7 +32,7 @@ proxy.ssl_proxy = f"{proxy_ip}:{proxy_port}"
 def screen_shot(url: str, div_id: str | None, element: str | None, wait_xpath: str, script_state: str | None,
                 node_xpath: str):
     request_url = host + url
-    (driver, user_path) = get_driver()
+    driver = get_driver()
     # 搜索结果部分完整截图
     try:
         driver.get(request_url)
@@ -75,7 +72,7 @@ def get_future(_type: str):
     else:
         r_node_target = '/html/body/container/div/section[5]'
     request_url = host
-    (driver, user_path) = get_driver()
+    driver = get_driver()
     # 搜索结果部分完整截图
     try:
         driver.get(request_url)
@@ -120,17 +117,15 @@ def get_temp_file():
 
 def get_driver():
     option = webdriver.ChromeOptions()
-    user_data_dir = os.path.join(tempfile.gettempdir(), f"chrome_{int(time.time())}")
     option.add_argument('--headless')
     option.add_argument('--no-sandbox')
     option.add_argument('--disable-gpu')
     option.add_argument('--proxy-server=http://{}:{}'.format(proxy_ip, proxy_port))
-    option.add_argument(f"--user-data-dir={user_data_dir}")
     driver_path = ChromeDriverManager().install()
     service = Service(executable_path=driver_path, options=option)
     driver = webdriver.Chrome(options=option, service=service)
     driver.implicitly_wait(20)
-    return driver, user_data_dir
+    return driver
 
 
 def get_text():
@@ -148,7 +143,7 @@ def get_url(target: str):
 
 
 def get_html(_url: str):
-    (driver, user_path) = get_driver()
+    driver = get_driver()
     try:
         driver.get(_url)
         time.sleep(1)
