@@ -112,7 +112,7 @@ def get_driver():
     option.add_argument('--no-sandbox')
     option.add_argument('--disable-gpu')
     driver_path = ChromeDriverManager().install()
-    service = Service(executable_path=driver_path, options=option)
+    service = Service(port=9515, executable_path=driver_path, options=option)
     driver = webdriver.Chrome(options=option, service=service)
     driver.implicitly_wait(20)
     return driver
