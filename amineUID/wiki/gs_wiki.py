@@ -1,7 +1,6 @@
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.proxy import Proxy, ProxyType
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium import webdriver
 
@@ -17,16 +16,8 @@ import time
 import uuid
 import base64
 
-# 设置代理IP
-proxy_ip = "127.0.0.1"
-proxy_port = "7890"
 time_out = 60
 host = 'https://homdgcat.wiki'
-# 设置代理
-proxy = Proxy()
-proxy.proxy_type = ProxyType.MANUAL
-proxy.http_proxy = f"{proxy_ip}:{proxy_port}"
-proxy.ssl_proxy = f"{proxy_ip}:{proxy_port}"
 
 
 def screen_shot(url: str, div_id: str | None, element: str | None, wait_xpath: str, script_state: str | None,
@@ -120,7 +111,6 @@ def get_driver():
     option.add_argument('--headless')
     option.add_argument('--no-sandbox')
     option.add_argument('--disable-gpu')
-    option.add_argument('--proxy-server=http://{}:{}'.format(proxy_ip, proxy_port))
     driver_path = ChromeDriverManager().install()
     service = Service(executable_path=driver_path, options=option)
     driver = webdriver.Chrome(options=option, service=service)
