@@ -4,11 +4,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium import webdriver
 
+
 from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
 
-from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
 
 from gsuid_core.logger import logger
 
@@ -107,13 +108,13 @@ def get_temp_file():
 
 
 def get_driver():
-    option = webdriver.ChromeOptions()
+    option = webdriver.FirefoxOptions()
     option.add_argument('--headless')
     option.add_argument('--no-sandbox')
     option.add_argument('--disable-gpu')
-    driver_path = ChromeDriverManager().install()
-    service = Service(port=9515, executable_path=driver_path, options=option)
-    driver = webdriver.Chrome(options=option, service=service)
+    path = GeckoDriverManager().install()
+    service = Service(port=9515, executable_path=path)
+    driver = webdriver.Firefox(options=option, service=service)
     driver.implicitly_wait(20)
     return driver
 

@@ -12,6 +12,7 @@ beautifulsoup4 = "4.12.3"
 selenium = "4.29.0"
 requests = "^2.32.3"
 webdriver-manager = "^4.0.2"
+pillow = ">=9.2.0, <=10.2.0"
 
 [[tool.poetry.source]]
 name = "USTC"
