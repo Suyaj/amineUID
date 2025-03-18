@@ -1,4 +1,7 @@
-from gsuid_core.plugins.amineUID.amineUID.wiki.gs_wiki import get_future
+import asyncio
+import threading
+
+from gsuid_core.plugins.amineUID.amineUID.wiki.gs_wiki import get_future, refresh_data
 from gsuid_core.plugins.WutheringWavesUID.WutheringWavesUID.wutheringwaves_newsign import get_sign_func
 from gsuid_core.plugins.ZZZeroUID.ZZZeroUID.utils.hint import BIND_UID_HINT
 from gsuid_core.sv import SV
@@ -39,7 +42,13 @@ async def get_future_func(bot: Bot, ev: Event):
     texts = ev.text.strip().split(" ")
     await bot.send("正在查询，请稍后！！！")
     _type = 'gs' if texts[0] == '原神' else 'sr'
-    future = await get_future(_type)
+    threading.Thread(target=lambda: asyncio.run(refresh_data()), daemon=True).start()
+    # future = await get_future(_type)
     logger.info("未来信息，查询成功")
-    image = await convert_img(future, True)
-    await bot.send(image)
+    # image = await convert_img(future, True)
+    # await bot.send(image)
+
+@sv_wiki.on_prefix('刷新未来信息')
+async def get_refresh_data(bot: Bot, ev: Event):
+    threading.Thread(target=lambda: asyncio.run(refresh_data(bot)), daemon=True).start()
+    await bot.send("已经启动刷新程序，请稍后！！！")
