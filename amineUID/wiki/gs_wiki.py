@@ -116,6 +116,8 @@ def get_driver():
         option.add_argument('--headless')
         option.add_argument('--no-sandbox')
         option.add_argument('--disable-gpu')
+        option.add_argument('--disable-dev-shadow')
+        option.add_argument('--allow-system-access')
         path = GeckoDriverManager().install()
         service = Service(port=9515, executable_path=path)
         driver = webdriver.Firefox(options=option, service=service)
