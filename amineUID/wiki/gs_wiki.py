@@ -18,7 +18,7 @@ time_out = 60
 host = 'https://homdgcat.wiki'
 
 
-def screen_shot(url: str, div_id: str | None, element: str | None, wait_xpath: str, script_state: str | None,
+async def screen_shot(url: str, div_id: str | None, element: str | None, wait_xpath: str, script_state: str | None,
                 node_xpath: str):
     request_url = host + url
     driver = get_driver()
@@ -57,7 +57,7 @@ def screen_shot(url: str, div_id: str | None, element: str | None, wait_xpath: s
         driver.quit()
 
 
-def get_future(_type: str):
+async def get_future(_type: str):
     if _type == 'gs':
         r_node_target = '/html/body/container/div/section[4]'
     else:

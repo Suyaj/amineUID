@@ -40,6 +40,6 @@ async def get_all_sign_func(bot: Bot, ev: Event):
 async def get_future_func(bot: Bot, ev: Event):
     texts = ev.text.strip().split(" ")
     _type = 'gs' if texts[0] == '原神' else 'sr'
-    future = get_future(_type)
+    future = await get_future(_type)
     image = await convert_img(future, True)
     await bot.send(image)
