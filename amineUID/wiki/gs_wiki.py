@@ -1,3 +1,5 @@
+import asyncio
+
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
@@ -16,10 +18,11 @@ import base64
 
 time_out = 60
 host = 'https://homdgcat.wiki'
+executable_path = '/snap/bin/geckodriver'
 
 
 async def screen_shot(url: str, div_id: str | None, element: str | None, wait_xpath: str, script_state: str | None,
-                node_xpath: str):
+                      node_xpath: str):
     request_url = host + url
     driver = get_driver()
     if driver is None:
@@ -116,7 +119,7 @@ def get_driver():
         option.add_argument('--disable-gpu')
         option.add_argument('--disable-dev-shadow')
         option.add_argument('--allow-system-access')
-        service = Service(port=4444, host='127.0.0.1')
+        service = Service(executable_path=executable_path)
         driver = webdriver.Firefox(options=option, service=service)
         driver.implicitly_wait(20)
         return driver
@@ -177,5 +180,6 @@ def get_url_target(html, target):
 #             '/html/body/div[1]/container/divv/section[4]')
 # url = get_url("瓦雷莎")
 # print(url)
-future = get_future('sr')
-print(future)
+if __name__ == '__main__':
+    future = asyncio.run(get_future('sr'))
+    print(future)
