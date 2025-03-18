@@ -1,5 +1,8 @@
+import base64
 import time
+from io import BytesIO
 
+from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.service import Service
@@ -31,6 +34,17 @@ if __name__ == '__main__':
         driver.set_window_size(html.size['width'], html.size['height'])
         time.sleep(1)
         r_node = driver.find_element(By.XPATH, value='/html/body/container/div/section[4]')
+        _base64 = r_node.screenshot_as_base64
+        elements = r_node.find_elements(By.CSS_SELECTOR, 'a')
+        size = len(elements)
+        _width = elements[0].size['width']
+        img_width = (_width + 8) * size
+        binary_data = base64.b64decode(_base64)
+        image_data = BytesIO(binary_data)
+        img = Image.open(image_data)
+        height = img.size[1]
+        im = img.crop((0, 0, img_width, height))
+        im.save("result.png")
     except Exception as e:
         print('请求错误:{}', e)
     finally:
