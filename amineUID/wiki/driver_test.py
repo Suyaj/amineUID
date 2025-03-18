@@ -1,6 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
-from webdriver_manager.firefox import GeckoDriverManager
 
 
 def get_driver():
@@ -11,8 +10,7 @@ def get_driver():
         option.add_argument('--disable-gpu')
         option.add_argument('--disable-dev-shadow')
         option.add_argument('--allow-system-access')
-        path = GeckoDriverManager().install()
-        service = Service(port=9515, executable_path=path)
+        service = Service(port=4444, host='127.0.0.1')
         driver = webdriver.Firefox(options=option, service=service)
         driver.implicitly_wait(20)
         return driver
