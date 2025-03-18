@@ -9,7 +9,7 @@ if __name__ == '__main__':
     option.add_argument('--disable-gpu')
     option.add_argument('--disable-dev-shadow')
     option.add_argument('--allow-system-access')
-    service = Service(port=4444, host='127.0.0.1')
+    service = Service(executable_path='/snap/bin/geckodriver')
     driver = webdriver.Firefox(options=option, service=service)
     try:
         driver.implicitly_wait(20)
