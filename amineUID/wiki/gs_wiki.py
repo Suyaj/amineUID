@@ -4,7 +4,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium import webdriver
 
-
 from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
@@ -25,6 +24,8 @@ def screen_shot(url: str, div_id: str | None, element: str | None, wait_xpath: s
                 node_xpath: str):
     request_url = host + url
     driver = get_driver()
+    if driver is None:
+        return
     # 搜索结果部分完整截图
     try:
         driver.get(request_url)
@@ -65,6 +66,8 @@ def get_future(_type: str):
         r_node_target = '/html/body/container/div/section[5]'
     request_url = host
     driver = get_driver()
+    if driver is None:
+        return
     # 搜索结果部分完整截图
     try:
         driver.get(request_url)
@@ -108,15 +111,18 @@ def get_temp_file():
 
 
 def get_driver():
-    option = webdriver.FirefoxOptions()
-    option.add_argument('--headless')
-    option.add_argument('--no-sandbox')
-    option.add_argument('--disable-gpu')
-    path = GeckoDriverManager().install()
-    service = Service(port=9515, executable_path=path)
-    driver = webdriver.Firefox(options=option, service=service)
-    driver.implicitly_wait(20)
-    return driver
+    try:
+        option = webdriver.FirefoxOptions()
+        option.add_argument('--headless')
+        option.add_argument('--no-sandbox')
+        option.add_argument('--disable-gpu')
+        path = GeckoDriverManager().install()
+        service = Service(port=9515, executable_path=path)
+        driver = webdriver.Firefox(options=option, service=service)
+        driver.implicitly_wait(20)
+        return driver
+    except Exception as e:
+        logger.error(f"webdriver启动失败：{e}")
 
 
 def get_text():
@@ -135,6 +141,8 @@ def get_url(target: str):
 
 def get_html(_url: str):
     driver = get_driver()
+    if driver is None:
+        return
     try:
         driver.get(_url)
         time.sleep(1)
