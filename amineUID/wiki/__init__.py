@@ -36,10 +36,12 @@ async def get_all_sign_func(bot: Bot, ev: Event):
     await bot.send(msg)
 
 
-@sv_wiki.on_prefix('未来信息')
+@sv_wiki.on_prefix(('未来信息', '未来'))
 async def get_future_func(bot: Bot, ev: Event):
     texts = ev.text.strip().split(" ")
+    await bot.send("正在查询，请稍后！！！")
     _type = 'gs' if texts[0] == '原神' else 'sr'
     future = await get_future(_type)
+    logger.info("未来信息，查询成功")
     image = await convert_img(future, True)
     await bot.send(image)
