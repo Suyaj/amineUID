@@ -13,7 +13,7 @@ async def test():
         await page.goto("https://homdgcat.wiki")
         await page.wait_for_function("()=>{return document.getElementsByClassName('n1').length > 0;}")
         time.sleep(1)
-        await page.wait_for_function('''
+        status = await page.evaluate('''
         () => {
             let images = document.getElementsByClassName("n1")[0].getElementsByTagName('img');
             for (let image of images) {
@@ -24,6 +24,19 @@ async def test():
             return true;
         }
         ''')
+        while status is False:
+            time.sleep(1)
+            status = await page.evaluate('''
+                    () => {
+                        let images = document.getElementsByClassName("n1")[0].getElementsByTagName('img');
+                        for (let image of images) {
+                            if(!image.complete){
+                              return false;
+                            }
+                        }
+                        return true;
+                    }
+                    ''')
         node = await page.query_selector("body > container > div > section.n1")
         binary_data = await node.screenshot()
         elements = await node.query_selector_all("a")
