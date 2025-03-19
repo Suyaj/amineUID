@@ -62,17 +62,17 @@ async def refresh_data(bot: Bot = None):
 async def get_gs_node_images(launch, html, text_list):
     for text in text_list:
         target = get_url_target(html, text)
-        logger.info("处理{}数据", target)
+        logger.info("处理{}数据", text)
         await gs_screen_shot(launch, target, text)
-        logger.info("{}数据处理完成", target)
+        logger.info("{}数据处理完成", text)
 
 
 async def get_sr_node_images(launch, html, text_list):
     for text in text_list:
         target = get_url_target(html, text)
-        logger.info("处理{}数据", target)
+        logger.info("处理{}数据", text)
         await sr_screen_shot(launch, target, text)
-        logger.info("{}数据处理完成", target)
+        logger.info("{}数据处理完成", text)
 
 
 async def sr_screen_shot(launch, url: str, name: str):
