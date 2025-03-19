@@ -36,6 +36,8 @@ async def test():
         height = img.size[1]
         im = img.crop((0, 0, img_width, height))
         im.save('test.png')
+    except Exception as e:
+        print(e)
     finally:
         await page.close()
         await launch.close()
