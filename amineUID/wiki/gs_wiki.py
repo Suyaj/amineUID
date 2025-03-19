@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
 
-from amineUID.utils.contants import WIKI_URL, FUTURE_PATH
+from gsuid_core.plugins.amineUID.amineUID.utils.contants import WIKI_URL, FUTURE_PATH
 from gsuid_core.bot import Bot
 
 time_out = 60
