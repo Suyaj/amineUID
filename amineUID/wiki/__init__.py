@@ -69,5 +69,5 @@ async def get_future_func(bot: Bot, ev: Event):
 @sv_wiki.on_fullmatch('刷新未来信息')
 async def get_refresh_data(bot: Bot, ev: Event):
     await bot.send("正在启动刷新程序，请稍后！！！")
-    threading.Thread(asyncio.run(refresh_data(bot)), daemon=True).start()
+    threading.Thread(target=lambda: asyncio.run(refresh_data(bot)), daemon=True).start()
 
