@@ -200,6 +200,7 @@ def get_wait_exec(class_name: str):
 
 
 async def wait(page, class_name: str):
+    time.sleep(1)
     status = await page.evaluate(get_wait_exec(class_name))
     while status is False:
         time.sleep(1)
