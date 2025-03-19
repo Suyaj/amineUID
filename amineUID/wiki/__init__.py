@@ -1,6 +1,10 @@
 import asyncio
+import os
 import threading
+from pathlib import Path
+from PIL import Image
 
+from gsuid_core.plugins.amineUID.amineUID.utils.contants import FUTURE_PATH
 from gsuid_core.plugins.amineUID.amineUID.wiki.gs_wiki import get_future, refresh_data
 from gsuid_core.plugins.WutheringWavesUID.WutheringWavesUID.wutheringwaves_newsign import get_sign_func
 from gsuid_core.plugins.ZZZeroUID.ZZZeroUID.utils.hint import BIND_UID_HINT
@@ -37,18 +41,33 @@ async def get_all_sign_func(bot: Bot, ev: Event):
     await bot.send(msg)
 
 
-@sv_wiki.on_prefix(('未来信息', '未来'))
+@sv_wiki.on_prefix('未来数据')
+async def get_future_func(bot: Bot, ev: Event):
+    texts = ev.text.strip().split(" ")
+    node_name = texts[0]
+    path = Path.joinpath(FUTURE_PATH, 'data', f'{node_name}.png')
+    if os.path.exists(path) is False:
+        return await bot.send("未来信息不存在，请刷新信息！！！")
+    img = Image.open(path)
+    logger.info("未来信息，查询成功")
+    image = await convert_img(img, True)
+    await bot.send(image)
+
+
+@sv_wiki.on_prefix('未来版本')
 async def get_future_func(bot: Bot, ev: Event):
     texts = ev.text.strip().split(" ")
     await bot.send("正在查询，请稍后！！！")
     _type = 'gs' if texts[0] == '原神' else 'sr'
-    threading.Thread(target=lambda: asyncio.run(refresh_data()), daemon=True).start()
-    # future = await get_future(_type)
+    path = Path.joinpath(FUTURE_PATH, f'{_type}_future.png')
+    img = Image.open(path)
     logger.info("未来信息，查询成功")
-    # image = await convert_img(future, True)
-    # await bot.send(image)
+    image = await convert_img(img, True)
+    await bot.send(image)
 
-@sv_wiki.on_prefix('刷新未来信息')
+
+@sv_wiki.on_fullmatch('刷新未来信息')
 async def get_refresh_data(bot: Bot, ev: Event):
+    await bot.send("正在启动刷新程序，请稍后！！！")
     threading.Thread(target=lambda: asyncio.run(refresh_data(bot)), daemon=True).start()
-    await bot.send("已经启动刷新程序，请稍后！！！")
+
