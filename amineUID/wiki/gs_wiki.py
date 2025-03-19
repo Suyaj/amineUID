@@ -23,7 +23,7 @@ import base64
 
 time_out = 60
 host = WIKI_URL
-executable_path = '/snap/bin/geckodriver'
+executable_path = '/snap/bin/chromium.chromedriver'
 gs_future = Path.joinpath(FUTURE_PATH, 'gs_future')
 sr_future = Path.joinpath(FUTURE_PATH, 'sr_future')
 data_future = Path.joinpath(FUTURE_PATH, 'data')

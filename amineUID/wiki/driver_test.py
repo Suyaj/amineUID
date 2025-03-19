@@ -5,19 +5,19 @@ from io import BytesIO
 from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 
 if __name__ == '__main__':
-    option = webdriver.FirefoxOptions()
+    option = webdriver.ChromeOptions()
     option.add_argument('--headless')
     option.add_argument('--no-sandbox')
     option.add_argument('--disable-gpu')
     option.add_argument('--disable-dev-shadow')
     option.add_argument('--allow-system-access')
-    service = Service(executable_path='/snap/bin/geckodriver')
-    driver = webdriver.Firefox(options=option, service=service)
+    service = Service(executable_path = '/snap/bin/chromium.chromedriver')
+    driver = webdriver.Chrome(options=option, service=service)
     try:
         driver.get("https://homdgcat.wiki")
         WebDriverWait(driver, 60).until(
