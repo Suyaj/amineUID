@@ -15,7 +15,7 @@ from gsuid_core.bot import Bot
 
 time_out = 60
 host = WIKI_URL
-executable_path = '/snap/bin/chromium.chromedriver'
+executable_path = '/root/.cache/ms-playwright/chromium_headless_shell-1161/chrome-linux/headless_shell'
 gs_future = Path.joinpath(FUTURE_PATH, 'gs_future')
 sr_future = Path.joinpath(FUTURE_PATH, 'sr_future')
 data_future = Path.joinpath(FUTURE_PATH, 'data')
@@ -29,7 +29,7 @@ async def refresh_data(bot: Bot = None):
             await send(bot, "已经启动刷新程序，请等待处理！！！")
             playwright = await async_playwright().start()
             await send(bot, "启动playwright")
-            launch = await playwright.chromium.launch(headless=True)
+            launch = await playwright.chromium.launch(executable_path=executable_path,headless=True)
             await send(bot, "启动launch")
         except Exception as e:
             logger.exception(e)
