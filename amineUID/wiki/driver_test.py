@@ -1,15 +1,8 @@
 import asyncio
-import base64
-import time
 from io import BytesIO
 
 from PIL import Image
 from playwright.async_api import async_playwright
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as ec
 
 async def test():
     playwright = await async_playwright().start()
@@ -40,6 +33,9 @@ async def test():
     height = img.size[1]
     im = img.crop((0, 0, img_width, height))
     im.save('test.png')
+    await page.close()
+    await launch.close()
+    await playwright.stop()
 
 if __name__ == '__main__':
     asyncio.run(test())
