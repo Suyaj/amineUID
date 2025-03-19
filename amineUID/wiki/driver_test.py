@@ -1,4 +1,5 @@
 import asyncio
+import time
 from io import BytesIO
 
 from PIL import Image
@@ -10,6 +11,7 @@ async def test():
     page = await launch.new_page()
     await page.goto("https://homdgcat.wiki")
     await page.wait_for_function("()=>{return document.getElementsByClassName('n1').length > 0;}")
+    time.sleep(1)
     await page.wait_for_function('''
     () => {
         let images = document.getElementsByClassName("n1")[0].getElementsByTagName('img');
