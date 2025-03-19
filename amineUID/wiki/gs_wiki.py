@@ -33,6 +33,7 @@ async def refresh_data(bot: Bot = None):
             await send(bot, "启动launch")
         except Exception as e:
             logger.exception(e)
+            lock.release()
             return
         try:
             page_source = await get_future(launch)
