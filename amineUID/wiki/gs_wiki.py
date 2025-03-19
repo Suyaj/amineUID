@@ -2,6 +2,7 @@ import asyncio
 import platform
 from pathlib import Path
 
+from playwright.async_api import async_playwright
 from selenium.common import NoSuchElementException
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support import expected_conditions as ec
@@ -19,7 +20,6 @@ from gsuid_core.logger import logger
 
 import time
 import uuid
-import base64
 
 time_out = 60
 host = WIKI_URL
@@ -30,19 +30,23 @@ data_future = Path.joinpath(FUTURE_PATH, 'data')
 
 
 async def refresh_data(bot: Bot = None):
-    page_source = await get_future()
+    playwright = await async_playwright().start()
+    launch = await playwright.chromium.launch(headless=True)
+    page_source = await get_future(launch)
     html = BeautifulSoup(page_source, 'html.parser')
     target_list = get_text(html)
     text_list = target_list['gs']
-    # await get_gs_node_images(html, text_list)
-    text_list = target_list['sr']
-    await get_sr_node_images(html, text_list)
+    await get_gs_node_images(launch, html, text_list)
+    # text_list = target_list['sr']
+    # await get_sr_node_images(html, text_list)
+    await launch.close()
+    await playwright.stop()
 
 
-async def get_gs_node_images(html, text_list):
+async def get_gs_node_images(launch, html, text_list):
     for text in text_list:
         target = get_url_target(html, text)
-        await gs_screen_shot(target, text)
+        await gs_screen_shot(launch, target, text)
 
 
 async def get_sr_node_images(html, text_list):
@@ -68,9 +72,11 @@ async def sr_screen_shot(url: str, name: str):
         time.sleep(0.5)
         driver.execute_script("document.body.style.zoom='1'")
         time.sleep(1)
-        html = driver.find_element(By.CSS_SELECTOR, 'container')
+        container = driver.find_element(By.CSS_SELECTOR, '#content_2 > div')
+        width = container.size['width']
+        height = container.size['height'] + 650
         # 将浏览器的宽高设置最大
-        driver.set_window_size(html.size['width'], html.size['height'] + 200)
+        driver.set_window_size(width, height)
         time.sleep(0.5)
         node = driver.find_element(By.XPATH, value="//*[@id='content_2']/div")
         if data_future.exists() is False:
@@ -95,45 +101,30 @@ def get_sr_type(driver):
             return 3
 
 
-async def gs_screen_shot(url: str, name: str):
+async def gs_screen_shot(launch, url: str, name: str):
     request_url = host + url
-    driver = get_driver()
-    if driver is None:
-        return
-    # 搜索结果部分完整截图
-    try:
-        driver.get(request_url)
-        WebDriverWait(driver, time_out).until(
-            ec.presence_of_element_located((By.XPATH, '/html'))
-        )
-        _type = get_gs_type(driver)
-        driver.execute_script("document.body.style.zoom='0.1'")
-        if _type == 1:
-            await wait(driver, "a_data")
-        elif _type == 2:
-            await wait(driver, "r_data")
+    page = await launch.new_page()
+    await page.goto(request_url)
+    await page.wait_for_load_state("networkidle")
+    data = await page.query_selector(".a_data")
+    if data is not None:
+        selector_target = ".a_data"
+    else:
+        data = await page.query_selector(".r_data")
+        if data is not None:
+            selector_target = ".r_data"
         else:
-            await wait(driver, "weapon_section")
-        time.sleep(0.5)
-        driver.execute_script("document.body.style.zoom='1'")
-        time.sleep(1)
-        html = driver.find_element(By.CSS_SELECTOR, 'container')
-        # 将浏览器的宽高设置最大
-        driver.set_window_size(html.size['width'], html.size['height'] + 200)
-        time.sleep(0.5)
-        if _type == 1:
-            node = driver.find_element(By.XPATH, value="/html/body/div[1]/container/divv/section[4]")
-        elif _type == 2:
-            node = driver.find_element(By.XPATH, value="/html/body/div[1]/container/divv/section[3]/div[1]")
-        else:
-            node = driver.find_element(By.XPATH, value="/html/body/div[1]/container/divv/section[3]")
-        if data_future.exists() is False:
-            data_future.mkdir()
-        node.screenshot(str(Path.joinpath(data_future, f'{name}.png')).rstrip("\\"))  # 得到整个网页的完整截图
-    except Exception as e:
-        logger.error('请求错误:{}', e)
-    finally:
-        driver.quit()
+            selector_target = ".weapon_section"
+    container = await page.query_selector("body > div.scroller > container")
+    box = await container.bounding_box()
+    width = box["width"]
+    height = box["height"]
+    page.set_viewport_size(width, height)
+    node = await page.query_selector(selector_target)
+    if data_future.exists() is False:
+        data_future.mkdir()
+    await node.screenshot(path=str(Path.joinpath(data_future, f'{name}.png')).rstrip("\\"))
+    await page.close()
 
 
 def get_gs_type(driver):
@@ -156,36 +147,21 @@ def is_exist(driver, class_name):
         return False
 
 
-async def get_future():
+async def get_future(launch):
     request_url = host
-    driver = get_driver()
-    if driver is None:
-        return
-    # 搜索结果部分完整截图
-    try:
-        driver.get(request_url)
-        WebDriverWait(driver, time_out).until(
-            ec.presence_of_element_located((By.XPATH, '/html/body/container/div/section[4]'))
-        )
-        await wait(driver, "n1")
-        time.sleep(0.5)
-        html = driver.find_element(By.CSS_SELECTOR, 'container')
-        # 将浏览器的宽高设置最大
-        driver.set_window_size(html.size['width'], html.size['height'])
-        time.sleep(0.5)
-        r_node = driver.find_element(By.XPATH, value='/html/body/container/div/section[4]')
-        await to_future_image(r_node, gs_future)
-        driver.find_element(By.XPATH, '/html/body/container/div/section[1]/schedule[2]').click()
-        await wait(driver, "n2")
-        time.sleep(0.5)
-        r_node = driver.find_element(By.XPATH, value='/html/body/container/div/section[5]')
-        await to_future_image(r_node, sr_future)
-        # 返回页面数据
-        return driver.page_source
-    except Exception as e:
-        logger.error('请求错误:{}', e)
-    finally:
-        driver.quit()
+    page = await launch.new_page()
+    await page.goto(request_url)
+    await page.wait_for_load_state("domcontentloaded")
+    await page.wait_for_function(get_wait_exec("n1"))
+    node = await page.query_selector("body > container > div > section.n1")
+    await to_future_image(node, gs_future)
+    await page.click(selector="body > container > div > section.home_select > schedule:nth-child(2)")
+    await page.wait_for_function(get_wait_exec("n2"))
+    node = await page.query_selector("body > container > div > section.n2")
+    await to_future_image(node, sr_future)
+    content = await page.content()
+    await page.close()
+    return content
 
 
 async def wait(driver, class_name: str):
@@ -195,16 +171,16 @@ async def wait(driver, class_name: str):
         ready_state = driver.execute_script(execute_script)
 
 
-async def to_future_image(r_node, path: str):
-    _base64 = r_node.screenshot_as_base64
-    elements = r_node.find_elements(By.CSS_SELECTOR, 'a')
+async def to_future_image(node, path: str):
+    binary_data = await node.screenshot()
+    elements = await node.query_selector_all("a")
     size = len(elements)
-    _width = elements[0].size['width']
+    box = await elements[0].bounding_box()
+    _width = box['width']
     img_width = (_width + 8) * size
-    binary_data = base64.b64decode(_base64)
     image_data = BytesIO(binary_data)
     img = Image.open(image_data)
-    height = img.size[1] - 16
+    height = img.size[1]
     im = img.crop((0, 0, img_width, height))
     if FUTURE_PATH.exists() is False:
         FUTURE_PATH.mkdir()
@@ -279,6 +255,20 @@ def get_url_target(html, target):
         p = a.find_next("p", {"class": "new_text"})
         if p.get_text() == target:
             return a['href']
+
+
+def get_wait_exec(class_name: str):
+    return '''
+    () => {
+        let images = document.getElementsByClassName("''' + class_name + '''")[0].getElementsByTagName('img');
+        for (let image of images) {
+            if(!image.complete){
+              return false;
+            }
+        }
+        return true;
+    }
+    '''
 
 
 # url = get_url("瓦雷莎")
