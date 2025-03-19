@@ -1,5 +1,6 @@
 import asyncio
 import threading
+import time
 from pathlib import Path
 
 from playwright.async_api import async_playwright
@@ -24,25 +25,25 @@ lock = threading.Lock()
 
 async def refresh_data(bot: Bot = None):
     if lock.acquire(timeout=5):
-        await bot.send("已经启动刷新程序，请等待处理！！！")
+        await send(bot, "已经启动刷新程序，请等待处理！！！")
         playwright = await async_playwright().start()
-        await bot.send("启动playwright")
+        await send(bot, "启动playwright")
         launch = await playwright.chromium.launch(headless=True)
-        await bot.send("启动launch")
+        await send(bot, "启动launch")
         try:
             page_source = await get_future(launch)
             logger.info("未来信息目录加载完成")
-            await bot.send("未来信息目录加载完成")
+            await send(bot, "未来信息目录加载完成")
             html = BeautifulSoup(page_source, 'html.parser')
             target_list = get_text(html)
             text_list = target_list['gs']
             await get_gs_node_images(launch, html, text_list)
             logger.info("原神未来信息加载完成")
-            await bot.send("原神未来信息加载完成，包含：" + ",".join(text_list))
+            await send(bot, "原神未来信息加载完成，包含：" + ",".join(text_list))
             text_list = target_list['sr']
             await get_sr_node_images(launch, html, text_list)
             logger.info("崩铁未来信息加载完成")
-            await bot.send("崩铁未来信息加载完成，包含：" + ",".join(text_list))
+            await send(bot, "崩铁未来信息加载完成，包含：" + ",".join(text_list))
         except Exception as e:
             logger.exception(e)
         finally:
@@ -56,13 +57,17 @@ async def refresh_data(bot: Bot = None):
 async def get_gs_node_images(launch, html, text_list):
     for text in text_list:
         target = get_url_target(html, text)
+        logger.info("处理{}数据", target)
         await gs_screen_shot(launch, target, text)
+        logger.info("{}数据处理完成", target)
 
 
 async def get_sr_node_images(launch, html, text_list):
     for text in text_list:
         target = get_url_target(html, text)
+        logger.info("处理{}数据", target)
         await sr_screen_shot(launch, target, text)
+        logger.info("{}数据处理完成", target)
 
 
 async def sr_screen_shot(launch, url: str, name: str):
@@ -71,7 +76,7 @@ async def sr_screen_shot(launch, url: str, name: str):
     await page.goto(request_url)
     await page.wait_for_load_state("networkidle")
     await page.evaluate("document.body.style.zoom='0.1'")
-    await page.wait_for_function(get_wait_exec("mon_body"))
+    await wait(page, "mon_body")
     await page.evaluate("document.body.style.zoom='1'")
     container = await page.query_selector("#content_2")
     box = await container.bounding_box()
@@ -90,6 +95,7 @@ async def gs_screen_shot(launch, url: str, name: str):
     page = await launch.new_page()
     await page.goto(request_url)
     await page.wait_for_load_state("networkidle")
+    await page.evaluate("document.body.style.zoom='0.1'")
     data = await page.query_selector(".a_data")
     if data is not None:
         wait_class_name = "a_data"
@@ -102,12 +108,13 @@ async def gs_screen_shot(launch, url: str, name: str):
         else:
             wait_class_name = "weapon_section"
             selector_target = ".weapon_section"
+    await wait(page, wait_class_name)
+    await page.evaluate("document.body.style.zoom='1'")
     container = await page.query_selector("body > div.scroller > container")
     box = await container.bounding_box()
     width = box["width"]
     height = box["height"]
     await page.set_viewport_size({"width": int(width), "height": int(height)})
-    await page.wait_for_function(get_wait_exec(wait_class_name))
     node = await page.query_selector(f'css={selector_target}')
     if data_future.exists() is False:
         data_future.mkdir()
@@ -120,11 +127,11 @@ async def get_future(launch):
     page = await launch.new_page()
     await page.goto(request_url)
     await page.wait_for_function("()=>{return document.getElementsByClassName('n1').length > 0;}")
-    await page.wait_for_function(get_wait_exec("n1"))
+    await wait(page, "n1")
     node = await page.query_selector("body > container > div > section.n1")
     await to_future_image(node, gs_future)
     await page.click(selector="body > container > div > section.home_select > schedule:nth-child(2)")
-    await page.wait_for_function(get_wait_exec("n2"))
+    await wait(page, "n2")
     node = await page.query_selector("body > container > div > section.n2")
     await to_future_image(node, sr_future)
     content = await page.content()
@@ -185,6 +192,18 @@ def get_wait_exec(class_name: str):
         return true;
     }
     '''
+
+
+async def wait(page, class_name: str):
+    status = await page.evaluate(get_wait_exec(class_name))
+    while status is False:
+        time.sleep(1)
+        status = await page.evaluate(get_wait_exec(class_name))
+
+
+async def send(bot: Bot, msg: str):
+    if bot is not None:
+        await bot.send(msg)
 
 
 if __name__ == '__main__':
