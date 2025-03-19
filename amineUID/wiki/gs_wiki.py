@@ -29,7 +29,7 @@ async def refresh_data(bot: Bot = None):
             await send(bot, "已经启动刷新程序，请等待处理！！！")
             playwright = await async_playwright().start()
             await send(bot, "启动playwright")
-            launch = await playwright.chromium.launch(executable_path=executable_path,headless=True)
+            launch = await playwright.chromium.launch(headless=True)
             await send(bot, "启动launch")
         except Exception as e:
             logger.exception(e)
@@ -79,7 +79,7 @@ async def sr_screen_shot(launch, url: str, name: str):
     request_url = host + url
     page = await launch.new_page()
     await page.goto(request_url)
-    await page.wait_for_load_state("networkidle")
+    await page.wait_for_load_state("load")
     await page.evaluate("document.body.style.zoom='0.1'")
     await wait(page, "mon_body")
     await page.evaluate("document.body.style.zoom='1'")
@@ -99,7 +99,7 @@ async def gs_screen_shot(launch, url: str, name: str):
     request_url = host + url
     page = await launch.new_page()
     await page.goto(request_url)
-    await page.wait_for_load_state("networkidle")
+    await page.wait_for_load_state("load")
     await page.evaluate("document.body.style.zoom='0.1'")
     data = await page.query_selector(".a_data")
     if data is not None:
