@@ -26,7 +26,9 @@ async def refresh_data(bot: Bot = None):
     if lock.acquire(timeout=5):
         await bot.send("已经启动刷新程序，请等待处理！！！")
         playwright = await async_playwright().start()
+        await bot.send("启动playwright")
         launch = await playwright.chromium.launch(headless=True)
+        await bot.send("启动launch")
         try:
             page_source = await get_future(launch)
             logger.info("未来信息目录加载完成")
