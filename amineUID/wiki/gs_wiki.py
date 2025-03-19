@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
 
+from gsuid_core.logger import logger
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import WIKI_URL, FUTURE_PATH
 from gsuid_core.bot import Bot
 
@@ -23,23 +24,28 @@ lock = threading.Lock()
 
 async def refresh_data(bot: Bot = None):
     if lock.acquire(timeout=5):
+        await bot.send("已经启动刷新程序，请等待处理！！！")
+        playwright = await async_playwright().start()
+        launch = await playwright.chromium.launch(headless=True)
         try:
-            await bot.send("已经启动刷新程序，请等待处理！！！")
-            playwright = await async_playwright().start()
-            launch = await playwright.chromium.launch(headless=True)
             page_source = await get_future(launch)
+            logger.info("未来信息目录加载完成")
             await bot.send("未来信息目录加载完成")
             html = BeautifulSoup(page_source, 'html.parser')
             target_list = get_text(html)
             text_list = target_list['gs']
             await get_gs_node_images(launch, html, text_list)
+            logger.info("原神未来信息加载完成")
             await bot.send("原神未来信息加载完成，包含：" + ",".join(text_list))
             text_list = target_list['sr']
             await get_sr_node_images(launch, html, text_list)
+            logger.info("崩铁未来信息加载完成")
             await bot.send("崩铁未来信息加载完成，包含：" + ",".join(text_list))
+        except Exception as e:
+            logger.exception(e)
+        finally:
             await launch.close()
             await playwright.stop()
-        finally:
             lock.release()
     else:
         await bot.send("程序已经启动了")
