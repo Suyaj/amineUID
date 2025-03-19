@@ -91,7 +91,7 @@ async def sr_screen_shot(launch, url: str, name: str):
     node = await page.query_selector("#content_2 > div")
     if data_future.exists() is False:
         data_future.mkdir()
-    await node.screenshot(path=str(Path.joinpath(data_future, f'{name}.png')).rstrip("\\"))
+    await node.screenshot(path=str(Path.joinpath(data_future, f'{name}.png')).rstrip("\\"), timeout=60000)
     await page.close()
 
 
@@ -123,7 +123,7 @@ async def gs_screen_shot(launch, url: str, name: str):
     node = await page.query_selector(f'css={selector_target}')
     if data_future.exists() is False:
         data_future.mkdir()
-    await node.screenshot(path=str(Path.joinpath(data_future, f'{name}.png')).rstrip("\\"))
+    await node.screenshot(path=str(Path.joinpath(data_future, f'{name}.png')).rstrip("\\"), timeout=60000)
     await page.close()
 
 
@@ -145,7 +145,7 @@ async def get_future(launch):
 
 
 async def to_future_image(node, path: str):
-    binary_data = await node.screenshot()
+    binary_data = await node.screenshot(timeout=60000)
     elements = await node.query_selector_all("a")
     size = len(elements)
     box = await elements[0].bounding_box()
