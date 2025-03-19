@@ -29,7 +29,7 @@ async def refresh_data(bot: Bot = None):
             await send(bot, "已经启动刷新程序，请等待处理！！！")
             playwright = await async_playwright().start()
             await send(bot, "启动playwright")
-            launch = await playwright.chromium.launch(headless=True)
+            launch = await playwright.chromium.launch(executable_path=executable_path, headless=True)
             await send(bot, "启动launch")
         except Exception as e:
             logger.exception(e)
