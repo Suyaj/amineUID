@@ -79,7 +79,7 @@ async def sr_screen_shot(launch, url: str, name: str):
     request_url = host + url
     page = await launch.new_page()
     await page.goto(request_url)
-    await page.wait_for_load_state("load")
+    await page.wait_for_load_state("networkidle")
     await page.evaluate("document.body.style.zoom='0.1'")
     await wait(page, "mon_body")
     await page.evaluate("document.body.style.zoom='1'")
@@ -99,7 +99,7 @@ async def gs_screen_shot(launch, url: str, name: str):
     request_url = host + url
     page = await launch.new_page()
     await page.goto(request_url)
-    await page.wait_for_load_state("load")
+    await page.wait_for_load_state("networkidle")
     await page.evaluate("document.body.style.zoom='0.1'")
     data = await page.query_selector(".a_data")
     if data is not None:
@@ -188,7 +188,11 @@ def get_url_target(html, target):
 def get_wait_exec(class_name: str):
     return '''
     () => {
-        let images = document.getElementsByClassName("''' + class_name + '''")[0].getElementsByTagName('img');
+        elements = document.getElementsByClassName("''' + class_name + '''")
+        if (elements.length == 0) {
+            return false;
+        }
+        let images = elements[0].getElementsByTagName('img');
         for (let image of images) {
             if(!image.complete){
               return false;
