@@ -1,6 +1,7 @@
 import asyncio
 import threading
 import time
+import platform
 from pathlib import Path
 
 from playwright.async_api import async_playwright
@@ -29,7 +30,14 @@ async def refresh_data(bot: Bot = None):
             await send(bot, "已经启动刷新程序，请等待处理！！！")
             playwright = await async_playwright().start()
             await send(bot, "启动playwright")
-            launch = await playwright.chromium.launch(executable_path=executable_path, headless=True)
+            os_name = platform.system()
+            if os_name.lower() == 'windows':
+                launch = await playwright.chromium.launch(headless=True)
+            elif os_name.lower() == 'linux':
+                launch = await playwright.chromium.launch(executable_path=executable_path, headless=True)
+            else:
+                logger.error("当前系统不支持")
+                return await send(bot, "当前系统不支持")
             await send(bot, "启动launch")
         except Exception as e:
             logger.exception(e)
