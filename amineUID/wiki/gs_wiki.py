@@ -51,11 +51,11 @@ async def refresh_data(bot: Bot = None):
             html = BeautifulSoup(page_source, 'html.parser')
             target_list = get_text(html)
             text_list = target_list['gs']
-            await get_gs_node_images(launch, html, text_list)
+            # await get_gs_node_images(launch, html, text_list)
             logger.info("原神未来信息加载完成")
             await send(bot, "原神未来信息加载完成，包含：" + ",".join(text_list))
             text_list = target_list['sr']
-            # await get_sr_node_images(launch, html, text_list)
+            await get_sr_node_images(launch, html, text_list)
             logger.info("崩铁未来信息加载完成")
             await send(bot, "崩铁未来信息加载完成，包含：" + ",".join(text_list))
         except Exception as e:
@@ -89,18 +89,25 @@ async def sr_screen_shot(launch, url: str, name: str):
     page = await launch.new_page()
     await page.goto(request_url)
     await page.wait_for_load_state("networkidle")
+    data = await page.query_selector(".t_skill")
+    if data is None:
+        length = await page.evaluate("document.getElementsByClassName('mon_body')[0].childNodes.length")
+        selector_targets = []
+        for i in range(0, length):
+            if i == 1:
+                continue
+            selector_targets.append(f"#content_2 > div > div:nth-child({i + 1})")
+    else:
+        selector_targets = ["#content_2 > div > div:nth-child(1)",
+                            "#content_2 > div > div.a_section.t_skill",
+                            "#content_2 > div > div:nth-child(3)"]
     await page.evaluate("document.body.style.zoom='0.1'")
     await wait(page, "mon_body")
     await page.evaluate("document.body.style.zoom='1'")
-    container = await page.query_selector("#content_2")
-    box = await container.bounding_box()
-    width = box["width"]
-    height = box["height"]
-    await page.set_viewport_size({"width": int(width), "height": int(height)})
-    node = await page.query_selector("#content_2 > div")
+    await set_max_view(page, "#content_2")
     if data_future.exists() is False:
         data_future.mkdir()
-    await node.screenshot(path=str(Path.joinpath(data_future, name)).rstrip("\\"), timeout=60000)
+    await to_images(page, selector_targets, str(Path.joinpath(data_future, name)).rstrip("\\"))
     await page.close()
 
 
@@ -140,15 +147,19 @@ async def gs_screen_shot(launch, url: str, name: str):
     await wait(page, wait_class_name)
     await page.evaluate("document.body.style.zoom='1'")
     time.sleep(0.5)
-    container = await page.query_selector("body > div.scroller > container")
-    box = await container.bounding_box()
-    width = box["width"]
-    height = box["height"]
-    await page.set_viewport_size({"width": int(width), "height": int(height)})
+    await set_max_view(page, "body > div.scroller > container")
     if data_future.exists() is False:
         data_future.mkdir()
     await to_images(page, selector_targets, str(Path.joinpath(data_future, name)).rstrip("\\"))
     await page.close()
+
+
+async def set_max_view(page, target):
+    container = await page.query_selector(target)
+    box = await container.bounding_box()
+    width = box["width"]
+    height = box["height"]
+    await page.set_viewport_size({"width": int(width), "height": int(height)})
 
 
 async def to_images(page, selector_targets: List[str], path: str):
