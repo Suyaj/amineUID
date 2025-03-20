@@ -3,8 +3,9 @@ import threading
 import time
 import platform
 from pathlib import Path
+from typing import List
 
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright, ElementHandle
 
 from bs4 import BeautifulSoup
 from PIL import Image
@@ -54,7 +55,7 @@ async def refresh_data(bot: Bot = None):
             logger.info("原神未来信息加载完成")
             await send(bot, "原神未来信息加载完成，包含：" + ",".join(text_list))
             text_list = target_list['sr']
-            await get_sr_node_images(launch, html, text_list)
+            # await get_sr_node_images(launch, html, text_list)
             logger.info("崩铁未来信息加载完成")
             await send(bot, "崩铁未来信息加载完成，包含：" + ",".join(text_list))
         except Exception as e:
@@ -99,7 +100,7 @@ async def sr_screen_shot(launch, url: str, name: str):
     node = await page.query_selector("#content_2 > div")
     if data_future.exists() is False:
         data_future.mkdir()
-    await node.screenshot(path=str(Path.joinpath(data_future, f'{name}.png')).rstrip("\\"), timeout=60000)
+    await node.screenshot(path=str(Path.joinpath(data_future, name)).rstrip("\\"), timeout=60000)
     await page.close()
 
 
@@ -108,31 +109,62 @@ async def gs_screen_shot(launch, url: str, name: str):
     page = await launch.new_page()
     await page.goto(request_url)
     await page.wait_for_load_state("networkidle")
-    await page.evaluate("document.body.style.zoom='0.1'")
     data = await page.query_selector(".a_data")
     if data is not None:
         wait_class_name = "a_data"
-        selector_target = ".a_data"
+        selector_targets = ["body > div.scroller > container > divv > section.a_data > div:nth-child(1)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(3)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(4)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(5)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(6)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(7)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(8)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(9)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(10)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(11)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(12)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(13)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(14)",
+                            "body > div.scroller > container > divv > section.a_data > div:nth-child(15)"]
     else:
         data = await page.query_selector(".r_data")
         if data is not None:
             wait_class_name = "r_data"
-            selector_target = "body > div.scroller > container > divv > section.r_data > div:nth-child(1)"
+            selector_targets = ["body > div.scroller > container > divv > section.r_data > div:nth-child(1)"]
         else:
             wait_class_name = "weapon_section"
-            selector_target = ".weapon_section"
+            selector_targets = ["body > div.scroller > container > divv > section.weapon_section > div:nth-child(1)",
+                                "body > div.scroller > container > divv > section.weapon_section > div.a_section.weapon_skill",
+                                "body > div.scroller > container > divv > section.weapon_section > div:nth-child(2)"]
+    await page.evaluate("document.body.style.zoom='0.1'")
     await wait(page, wait_class_name)
     await page.evaluate("document.body.style.zoom='1'")
+    time.sleep(0.5)
     container = await page.query_selector("body > div.scroller > container")
     box = await container.bounding_box()
     width = box["width"]
     height = box["height"]
     await page.set_viewport_size({"width": int(width), "height": int(height)})
-    node = await page.query_selector(f'css={selector_target}')
     if data_future.exists() is False:
         data_future.mkdir()
-    await node.screenshot(path=str(Path.joinpath(data_future, f'{name}.png')).rstrip("\\"), timeout=60000)
+    await to_images(page, selector_targets, str(Path.joinpath(data_future, name)).rstrip("\\"))
     await page.close()
+
+
+async def to_images(page, selector_targets: List[str], path: str):
+    images = []
+    for target in selector_targets:
+        node = await get_node(page, target)
+        images.append(await to_image(node))
+    await splicing(images, path)
+
+
+async def get_node(page, target):
+    node = await page.query_selector(f'css={target}')
+    while node is None:
+        time.sleep(0.5)
+        node = await page.query_selector(f'css={target}')
+    return node
 
 
 async def get_future(launch):
@@ -153,14 +185,12 @@ async def get_future(launch):
 
 
 async def to_future_image(node, path: str):
-    binary_data = await node.screenshot(timeout=60000)
     elements = await node.query_selector_all("a")
     size = len(elements)
     box = await elements[0].bounding_box()
     _width = box['width']
     img_width = (_width + 8) * size
-    image_data = BytesIO(binary_data)
-    img = Image.open(image_data)
+    img = await to_image(node)
     height = img.size[1]
     im = img.crop((0, 0, img_width, height))
     if FUTURE_PATH.exists() is False:
@@ -212,16 +242,38 @@ def get_wait_exec(class_name: str):
 
 
 async def wait(page, class_name: str):
-    time.sleep(1)
+    time.sleep(0.5)
     status = await page.evaluate(get_wait_exec(class_name))
     while status is False:
-        time.sleep(1)
+        time.sleep(0.5)
         status = await page.evaluate(get_wait_exec(class_name))
 
 
 async def send(bot: Bot, msg: str):
     if bot is not None:
         await bot.send(msg)
+
+
+async def splicing(images: List[Image], path: str):
+    if len(images) == 0:
+        return
+    _width = images[0].width
+    _height = 0
+    for image in images:
+        _height += image.height
+    new = Image.new('RGB', (_width, _height))
+    _height = 0
+    for image in images:
+        new.paste(image, (0, _height))
+        _height += image.height
+    new.save(f'{path}.png')
+
+
+async def to_image(node: ElementHandle):
+    binary_data = await node.screenshot(timeout=60000)
+    image_data = BytesIO(binary_data)
+    img = Image.open(image_data)
+    return img
 
 
 if __name__ == '__main__':
