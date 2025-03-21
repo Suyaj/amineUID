@@ -5,7 +5,7 @@ from pathlib import Path
 from PIL import Image
 
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import FUTURE_PATH
-from gsuid_core.plugins.amineUID.amineUID.wiki.gs_wiki import get_future, refresh_data
+from gsuid_core.plugins.amineUID.amineUID.wiki.core import get_future, refresh_data
 from gsuid_core.plugins.WutheringWavesUID.WutheringWavesUID.wutheringwaves_newsign import get_sign_func
 from gsuid_core.plugins.ZZZeroUID.ZZZeroUID.utils.hint import BIND_UID_HINT
 from gsuid_core.sv import SV
