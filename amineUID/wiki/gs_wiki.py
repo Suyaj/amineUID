@@ -51,7 +51,7 @@ async def refresh_data(bot: Bot = None):
             html = BeautifulSoup(page_source, 'html.parser')
             target_list = get_text(html)
             text_list = target_list['gs']
-            # await get_gs_node_images(launch, html, text_list)
+            await get_gs_node_images(launch, html, text_list)
             logger.info("原神未来信息加载完成")
             await send(bot, "原神未来信息加载完成，包含：" + ",".join(text_list))
             text_list = target_list['sr']
