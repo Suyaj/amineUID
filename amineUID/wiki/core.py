@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
 
+from gsuid_core.plugins.amineUID.amineUID.model.wiki import WikiBind
 from gsuid_core.logger import logger
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import WIKI_URL, FUTURE_PATH
 from gsuid_core.bot import Bot
@@ -71,6 +72,8 @@ async def refresh_data(bot: Bot = None):
 async def get_gs_node_images(launch, html, text_list):
     for text in text_list:
         target = get_url_target(html, text)
+        split = target.split('/')
+        await WikiBind.full_insert_data(name=text, value=split[len(split) - 1])
         logger.info("处理{}数据", text)
         await gs_screen_shot(launch, target, text)
         logger.info("{}数据处理完成", text)
@@ -79,6 +82,8 @@ async def get_gs_node_images(launch, html, text_list):
 async def get_sr_node_images(launch, html, text_list):
     for text in text_list:
         target = get_url_target(html, text)
+        split = target.split('/')
+        await WikiBind.full_insert_data(name=text, value=split[len(split) - 1])
         logger.info("处理{}数据", text)
         await sr_screen_shot(launch, target, text)
         logger.info("{}数据处理完成", text)
