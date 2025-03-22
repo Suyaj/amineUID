@@ -5,7 +5,7 @@ import platform
 from pathlib import Path
 from typing import List
 
-from playwright.async_api import async_playwright, ElementHandle
+from playwright.async_api import async_playwright, ElementHandle, Browser
 
 from bs4 import BeautifulSoup
 from PIL import Image
@@ -13,13 +13,15 @@ from io import BytesIO
 
 from gsuid_core.plugins.amineUID.amineUID.model.wiki import WikiBind
 from gsuid_core.logger import logger
-from gsuid_core.plugins.amineUID.amineUID.utils.contants import WIKI_URL, FUTURE_PATH
+from gsuid_core.plugins.amineUID.amineUID.utils.contants import WIKI_URL, FUTURE_PATH, WIKI_GS_CHANGE_URL, \
+    WIKI_SR_CHANGE_URL
 from gsuid_core.bot import Bot
 
 time_out = 60
 host = WIKI_URL
 executable_path = '/root/.cache/ms-playwright/chromium_headless_shell-1161/chrome-linux/headless_shell'
 gs_future = Path.joinpath(FUTURE_PATH, 'gs_future')
+versions = Path.joinpath(FUTURE_PATH, 'versions')
 sr_future = Path.joinpath(FUTURE_PATH, 'sr_future')
 data_future = Path.joinpath(FUTURE_PATH, 'data')
 
@@ -59,6 +61,7 @@ async def refresh_data(bot: Bot = None):
             await get_sr_node_images(launch, html, text_list)
             logger.info("崩铁未来信息加载完成")
             await send(bot, "崩铁未来信息加载完成，包含：" + ",".join(text_list))
+            await get_versions(launch, bot)
         except Exception as e:
             logger.exception(e)
         finally:
@@ -72,8 +75,11 @@ async def refresh_data(bot: Bot = None):
 async def get_gs_node_images(launch, html, text_list):
     for text in text_list:
         target = get_url_target(html, text)
-        split = target.split('/')
-        await WikiBind.full_insert_data(name=text, value=split[len(split) - 1])
+        url_split = target.split('/')
+        avatar_target = get_avatar_target(html, text)
+        avatar_split = avatar_target.split("/")
+        await WikiBind.full_insert_data(name=text, value=url_split[len(url_split) - 1], type="gs",
+                                        avatar=avatar_split[len(avatar_split) - 1])
         logger.info("处理{}数据", text)
         await gs_screen_shot(launch, target, text)
         logger.info("{}数据处理完成", text)
@@ -82,8 +88,11 @@ async def get_gs_node_images(launch, html, text_list):
 async def get_sr_node_images(launch, html, text_list):
     for text in text_list:
         target = get_url_target(html, text)
-        split = target.split('/')
-        await WikiBind.full_insert_data(name=text, value=split[len(split) - 1])
+        url_split = target.split('/')
+        avatar_target = get_avatar_target(html, text)
+        avatar_split = avatar_target.split("/")
+        await WikiBind.full_insert_data(name=text, value=url_split[len(url_split) - 1], type="sr",
+                                        avatar=avatar_split[len(avatar_split) - 1])
         logger.info("处理{}数据", text)
         await sr_screen_shot(launch, target, text)
         logger.info("{}数据处理完成", text)
@@ -157,6 +166,68 @@ async def gs_screen_shot(launch, url: str, name: str):
         data_future.mkdir()
     await to_images(page, selector_targets, str(Path.joinpath(data_future, name)).rstrip("\\"))
     await page.close()
+
+
+async def get_version(launch, url: str):
+    page = await launch.new_page()
+    await page.goto(url)
+    await page.wait_for_load_state("networkidle")
+    select = await page.query_selector("select")
+    options = await select.query_selector_all("option")
+    versionList = []
+    for option in options:
+        value = await option.get_attribute("value")
+        _version = f'V{value[0]}'
+        versionList.append(_version)
+        await select.select_option(value=value)
+        await page.evaluate("document.body.style.zoom='0.1'")
+        await wait(page, "cl_data")
+        await page.evaluate("document.body.style.zoom='1'")
+        length = await page.evaluate("document.getElementsByClassName('cl_data')[0].childNodes.length")
+        cl_data = await page.query_selector(".cl_data")
+        sections = await cl_data.query_selector_all(".a_section")
+        for i in range(1, int(length)):
+            await sections[i].click()
+        await set_max_view(page, ".content")
+        image_map = await get_images(sections)
+        await save_images(image_map, _version)
+        logger.info(f"{_version}版本数据获取成功")
+    return ",".join(versionList)
+
+
+async def save_images(image_map, version: str):
+    versions.mkdir(parents=True, exist_ok=True)
+    for (avatar, images) in image_map.items():
+        bind = await WikiBind.base_select_data(avatar=avatar)
+        avatar_path = Path.joinpath(versions, avatar)
+        avatar_path.mkdir(parents=True, exist_ok=True)
+        await splicing(images, str(Path.joinpath(avatar_path, bind.name)).rstrip("\\"))
+
+
+async def get_images(sections):
+    images = {}
+    for (index, section) in enumerate(sections):
+        if index == 0:
+            continue
+        image = await to_image(section)
+        head = await section.query_selector(".a_section_head")
+        img = await head.query_selector("img")
+        src = await img.get_attribute("src")
+        split = src.split("/")
+        avatar = split[len(split) - 1]
+        if images.get(avatar) is None:
+            images[avatar] = []
+        images[avatar].append(image)
+    return images
+
+
+async def get_versions(launch: Browser, bot: Bot = None):
+    msg = await get_version(launch, WIKI_GS_CHANGE_URL)
+    logger.info(f"原神改动获取成功,{msg}")
+    await send(bot, msg)
+    msg = await get_version(launch, WIKI_SR_CHANGE_URL)
+    logger.info(f"崩铁改动获取成功,{msg}")
+    await send(bot, msg)
 
 
 async def set_max_view(page, target):
@@ -237,6 +308,15 @@ def get_url_target(html, target):
         p = a.find_next("p", {"class": "new_text"})
         if p.get_text() == target:
             return a['href']
+
+
+def get_avatar_target(html, target):
+    a_list = html.find_all("a", {"target": "_blank"})
+    for a in a_list:
+        p = a.find_next("p", {"class": "new_text"})
+        if p.get_text() == target:
+            images = a.find_all("img")
+            return images[0]['src']
 
 
 def get_wait_exec(class_name: str):
