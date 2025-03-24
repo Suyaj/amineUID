@@ -18,6 +18,7 @@ from gsuid_core.utils.sign.sign import sign_in
 
 sv_wiki = SV("wiki")
 
+
 @sv_wiki.on_fullmatch("全部签到")
 async def get_all_sign_func(bot: Bot, ev: Event):
     logger.info(f'[全部签到] 用户: {ev.user_id}')
@@ -69,5 +70,6 @@ async def get_future_func(bot: Bot, ev: Event):
 @sv_wiki.on_fullmatch('刷新未来信息')
 async def get_refresh_data(bot: Bot, ev: Event):
     await bot.send("正在启动刷新程序，请稍后！！！")
-    threading.Thread(target=lambda: asyncio.run(refresh_data(bot)), daemon=True).start()
-
+    texts = ev.text.strip().split(" ")
+    _type = 'gs' if texts[0] == '原神' else 'sr'
+    threading.Thread(target=lambda: asyncio.run(refresh_data(_type, bot)), daemon=True).start()

@@ -11,8 +11,6 @@ from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
 
-from tomlkit import value
-
 from gsuid_core.plugins.amineUID.amineUID.model.wiki import WikiBind
 from gsuid_core.logger import logger
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import WIKI_URL, FUTURE_PATH, WIKI_GS_CHANGE_URL, \
@@ -30,7 +28,7 @@ data_future = Path.joinpath(FUTURE_PATH, 'data')
 lock = threading.Lock()
 
 
-async def refresh_data(bot: Bot = None):
+async def refresh_data(_type: str, bot: Bot = None):
     if lock.acquire(timeout=5):
         try:
             await send(bot, "已经启动刷新程序，请等待处理！！！")
@@ -50,20 +48,25 @@ async def refresh_data(bot: Bot = None):
             lock.release()
             return
         try:
-            page_source = await get_future(launch)
+            page_source = await get_future(launch, _type)
+            if page_source is '':
+                logger.info("未来信息目录加载失败")
+                await send(bot, "未来信息目录加载失败")
             logger.info("未来信息目录加载完成")
             await send(bot, "未来信息目录加载完成")
             html = BeautifulSoup(page_source, 'html.parser')
             target_list = get_text(html)
-            text_list = target_list['gs']
-            await get_gs_node_images(launch, html, text_list)
-            logger.info("原神未来信息加载完成")
-            await send(bot, "原神未来信息加载完成，包含：" + ",".join(text_list))
-            text_list = target_list['sr']
-            await get_sr_node_images(launch, html, text_list)
-            logger.info("崩铁未来信息加载完成")
-            await send(bot, "崩铁未来信息加载完成，包含：" + ",".join(text_list))
-            await get_versions(launch, bot)
+            if _type is 'gs':
+                text_list = target_list['gs']
+                await get_gs_node_images(launch, html, text_list)
+                logger.info("原神未来信息加载完成")
+                await send(bot, "原神未来信息加载完成，包含：" + ",".join(text_list))
+            elif _type is 'sr':
+                text_list = target_list['sr']
+                await get_sr_node_images(launch, html, text_list)
+                logger.info("崩铁未来信息加载完成")
+                await send(bot, "崩铁未来信息加载完成，包含：" + ",".join(text_list))
+            await get_versions(launch, _type, bot)
         except Exception as e:
             logger.exception(e)
         finally:
@@ -107,98 +110,112 @@ async def get_sr_node_images(launch, html, text_list):
 async def sr_screen_shot(launch, url: str, name: str):
     request_url = host + url
     page = await launch.new_page()
-    await page.goto(request_url)
-    await page.wait_for_load_state("networkidle")
-    data = await page.query_selector(".t_skill")
-    if data is None:
-        length = await page.evaluate("document.getElementsByClassName('mon_body')[0].childNodes.length")
-        selector_targets = []
-        for i in range(0, length):
-            if i == 1:
-                continue
-            selector_targets.append(f"#content_2 > div > div:nth-child({i + 1})")
-    else:
-        selector_targets = ["#content_2 > div > div:nth-child(1)",
-                            "#content_2 > div > div.a_section.t_skill",
-                            "#content_2 > div > div:nth-child(3)"]
-    await page.evaluate("document.body.style.zoom='0.1'")
-    await wait(page, "mon_body")
-    await page.evaluate("document.body.style.zoom='1'")
-    await set_max_view(page, "#content_2")
-    if data_future.exists() is False:
-        data_future.mkdir()
-    await to_images(page, selector_targets, str(Path.joinpath(data_future, name)).rstrip("\\"))
-    await page.close()
+    try:
+        await page.goto(request_url)
+        await page.wait_for_load_state("networkidle")
+        data = await page.query_selector(".t_skill")
+        if data is None:
+            length = await page.evaluate("document.getElementsByClassName('mon_body')[0].childNodes.length")
+            selector_targets = []
+            for i in range(0, length):
+                if i == 1:
+                    continue
+                selector_targets.append(f"#content_2 > div > div:nth-child({i + 1})")
+        else:
+            selector_targets = ["#content_2 > div > div:nth-child(1)",
+                                "#content_2 > div > div.a_section.t_skill",
+                                "#content_2 > div > div:nth-child(3)"]
+        await page.evaluate("document.body.style.zoom='0.1'")
+        await wait(page, "mon_body")
+        await page.evaluate("document.body.style.zoom='1'")
+        await set_max_view(page, "#content_2")
+        if data_future.exists() is False:
+            data_future.mkdir()
+        await to_images(page, selector_targets, str(Path.joinpath(data_future, name)).rstrip("\\"))
+    except Exception as e:
+        logger.error(e)
+    finally:
+        await page.close()
 
 
 async def gs_screen_shot(launch, url: str, name: str):
     request_url = host + url
     page = await launch.new_page()
-    await page.goto(request_url)
-    await page.wait_for_load_state("networkidle")
-    data = await page.query_selector(".a_data")
-    if data is not None:
-        wait_class_name = "a_data"
-        selector_targets = ["body > div.scroller > container > divv > section.a_data > div:nth-child(1)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(3)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(4)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(5)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(6)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(7)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(8)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(9)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(10)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(11)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(12)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(13)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(14)",
-                            "body > div.scroller > container > divv > section.a_data > div:nth-child(15)"]
-    else:
-        data = await page.query_selector(".r_data")
+    try:
+        await page.goto(request_url)
+        await page.wait_for_load_state("networkidle")
+        data = await page.query_selector(".a_data")
         if data is not None:
-            wait_class_name = "r_data"
-            selector_targets = ["body > div.scroller > container > divv > section.r_data > div:nth-child(1)"]
+            wait_class_name = "a_data"
+            selector_targets = ["body > div.scroller > container > divv > section.a_data > div:nth-child(1)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(3)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(4)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(5)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(6)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(7)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(8)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(9)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(10)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(11)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(12)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(13)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(14)",
+                                "body > div.scroller > container > divv > section.a_data > div:nth-child(15)"]
         else:
-            wait_class_name = "weapon_section"
-            selector_targets = ["body > div.scroller > container > divv > section.weapon_section > div:nth-child(1)",
-                                "body > div.scroller > container > divv > section.weapon_section > div.a_section.weapon_skill",
-                                "body > div.scroller > container > divv > section.weapon_section > div:nth-child(2)"]
-    await page.evaluate("document.body.style.zoom='0.1'")
-    await wait(page, wait_class_name)
-    await page.evaluate("document.body.style.zoom='1'")
-    time.sleep(0.5)
-    await set_max_view(page, "body > div.scroller > container")
-    if data_future.exists() is False:
-        data_future.mkdir()
-    await to_images(page, selector_targets, str(Path.joinpath(data_future, name)).rstrip("\\"))
-    await page.close()
+            data = await page.query_selector(".r_data")
+            if data is not None:
+                wait_class_name = "r_data"
+                selector_targets = ["body > div.scroller > container > divv > section.r_data > div:nth-child(1)"]
+            else:
+                wait_class_name = "weapon_section"
+                selector_targets = [
+                    "body > div.scroller > container > divv > section.weapon_section > div:nth-child(1)",
+                    "body > div.scroller > container > divv > section.weapon_section > div.a_section.weapon_skill",
+                    "body > div.scroller > container > divv > section.weapon_section > div:nth-child(2)"]
+        await page.evaluate("document.body.style.zoom='0.1'")
+        await wait(page, wait_class_name)
+        await page.evaluate("document.body.style.zoom='1'")
+        time.sleep(0.5)
+        await set_max_view(page, "body > div.scroller > container")
+        if data_future.exists() is False:
+            data_future.mkdir()
+        await to_images(page, selector_targets, str(Path.joinpath(data_future, name)).rstrip("\\"))
+    except Exception as e:
+        logger.error(e)
+    finally:
+        await page.close()
 
 
 async def get_version(launch, url: str):
     page = await launch.new_page()
-    await page.goto(url)
-    await page.wait_for_load_state("networkidle")
-    select = await page.query_selector("select")
-    options = await select.query_selector_all("option")
-    versionList = []
-    for option in options:
-        value = await option.get_attribute("value")
-        _version = f'V{value[0]}'
-        versionList.append(_version)
-        await select.select_option(value=value)
-        await page.evaluate("document.body.style.zoom='0.1'")
-        await wait(page, "cl_data")
-        await page.evaluate("document.body.style.zoom='1'")
-        length = await page.evaluate("document.getElementsByClassName('cl_data')[0].childNodes.length")
-        cl_data = await page.query_selector(".cl_data")
-        sections = await cl_data.query_selector_all(".a_section")
-        for i in range(1, int(length)):
-            await sections[i].click()
-        await set_max_view(page, ".content")
-        image_map = await get_images(sections)
-        await save_images(image_map, _version)
-        logger.info(f"{_version}版本数据获取成功")
-    return ",".join(versionList)
+    version_list = []
+    try:
+        await page.goto(url)
+        await page.wait_for_load_state("networkidle")
+        select = await page.query_selector("select")
+        options = await select.query_selector_all("option")
+        for option in options:
+            value = await option.get_attribute("value")
+            _version = f'V{value[0]}'
+            version_list.append(_version)
+            await select.select_option(value=value)
+            await page.evaluate("document.body.style.zoom='0.1'")
+            await wait(page, "cl_data")
+            await page.evaluate("document.body.style.zoom='1'")
+            length = await page.evaluate("document.getElementsByClassName('cl_data')[0].childNodes.length")
+            cl_data = await page.query_selector(".cl_data")
+            sections = await cl_data.query_selector_all(".a_section")
+            for i in range(1, int(length)):
+                await sections[i].click()
+            await set_max_view(page, ".content")
+            image_map = await get_images(sections)
+            await save_images(image_map, _version)
+            logger.info(f"{_version}版本数据获取成功")
+    except Exception as e:
+        logger.error(e)
+    finally:
+        page.close()
+    return ",".join(version_list)
 
 
 async def save_images(image_map, version: str):
@@ -227,13 +244,15 @@ async def get_images(sections):
     return images
 
 
-async def get_versions(launch: Browser, bot: Bot = None):
-    msg = await get_version(launch, WIKI_GS_CHANGE_URL)
-    logger.info(f"原神改动获取成功,{msg}")
-    await send(bot, f"原神改动获取成功,{msg}")
-    msg = await get_version(launch, WIKI_SR_CHANGE_URL)
-    logger.info(f"崩铁改动获取成功,{msg}")
-    await send(bot, f"崩铁改动获取成功,{msg}")
+async def get_versions(launch: Browser, _type: str, bot: Bot = None):
+    if _type is 'gs':
+        msg = await get_version(launch, WIKI_GS_CHANGE_URL)
+        logger.info(f"原神改动获取成功,{msg}")
+        await send(bot, f"原神改动获取成功,{msg}")
+    elif _type is 'sr':
+        msg = await get_version(launch, WIKI_SR_CHANGE_URL)
+        logger.info(f"崩铁改动获取成功,{msg}")
+        await send(bot, f"崩铁改动获取成功,{msg}")
 
 
 async def set_max_view(page, target):
@@ -260,20 +279,28 @@ async def get_node(page, target):
     return node
 
 
-async def get_future(launch):
+async def get_future(launch, _type):
     request_url = host
     page = await launch.new_page()
-    await page.goto(request_url)
-    await page.wait_for_function("()=>{return document.getElementsByClassName('n1').length > 0;}")
-    await wait(page, "n1")
-    node = await page.query_selector("body > container > div > section.n1")
-    await to_future_image(node, gs_future)
-    await page.click(selector="body > container > div > section.home_select > schedule:nth-child(2)")
-    await wait(page, "n2")
-    node = await page.query_selector("body > container > div > section.n2")
-    await to_future_image(node, sr_future)
-    content = await page.content()
-    await page.close()
+    content = ''
+    try:
+        await page.goto(request_url)
+        if _type is 'gs':
+            await page.wait_for_function("()=>{return document.getElementsByClassName('n1').length > 0;}")
+            await wait(page, "n1")
+            node = await page.query_selector("body > container > div > section.n1")
+            await to_future_image(node, gs_future)
+        if _type is 'sr':
+            await page.wait_for_function("()=>{return document.getElementsByClassName('n2').length > 0;}")
+            await page.click(selector="body > container > div > section.home_select > schedule:nth-child(2)")
+            await wait(page, "n2")
+            node = await page.query_selector("body > container > div > section.n2")
+            await to_future_image(node, sr_future)
+        content = await page.content()
+    except Exception as e:
+        logger.error(e)
+    finally:
+        await page.close()
     return content
 
 
