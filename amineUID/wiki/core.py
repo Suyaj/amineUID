@@ -174,7 +174,7 @@ async def gs_screen_shot(launch, url: str, name: str):
                     "body > div.scroller > container > divv > section.weapon_section > div:nth-child(2)"]
         await page.evaluate("document.body.style.zoom='0.1'")
         await wait(page, wait_class_name)
-        await page.evaluate("document.body.style.zoom='1'")
+        await page.evaluate("document.body.style.zoom='0.8'")
         time.sleep(0.5)
         await set_max_view(page, "body > div.scroller > container")
         if data_future.exists() is False:
