@@ -125,13 +125,14 @@ async def sr_screen_shot(launch, url: str, name: str):
             selector_targets = ["#content_2 > div > div:nth-child(1)",
                                 "#content_2 > div > div.a_section.t_skill",
                                 "#content_2 > div > div:nth-child(3)"]
-        await page.evaluate("document.body.style.zoom='0.1'")
+        await page.evaluate("document.body.style.zoom='0.05'")
         await wait(page, "mon_body")
         await page.evaluate("document.body.style.zoom='1'")
         logger.info(f"页面加载完成{request_url}")
         await set_max_view(page, "#content_2")
         if data_future.exists() is False:
             data_future.mkdir()
+        logger.info(f"开始处理图片{request_url}")
         await to_images(page, selector_targets, str(Path.joinpath(data_future, name)).rstrip("\\"))
     except Exception as e:
         logger.error(e)
@@ -175,7 +176,7 @@ async def gs_screen_shot(launch, url: str, name: str):
                     "body > div.scroller > container > divv > section.weapon_section > div:nth-child(2)"]
         await page.evaluate("document.body.style.zoom='0.1'")
         await wait(page, wait_class_name)
-        await page.evaluate("document.body.style.zoom='0.8'")
+        await page.evaluate("document.body.style.zoom='1'")
         time.sleep(0.5)
         await set_max_view(page, "body > div.scroller > container")
         if data_future.exists() is False:
