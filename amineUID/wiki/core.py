@@ -49,19 +49,19 @@ async def refresh_data(_type: str, bot: Bot = None):
             return
         try:
             page_source = await get_future(launch, _type)
-            if page_source is '':
+            if page_source == '':
                 logger.info("未来信息目录加载失败")
                 await send(bot, "未来信息目录加载失败")
             logger.info("未来信息目录加载完成")
             await send(bot, "未来信息目录加载完成")
             html = BeautifulSoup(page_source, 'html.parser')
             target_list = get_text(html)
-            if _type is 'gs':
+            if _type == 'gs':
                 text_list = target_list['gs']
                 await get_gs_node_images(launch, html, text_list)
                 logger.info("原神未来信息加载完成")
                 await send(bot, "原神未来信息加载完成，包含：" + ",".join(text_list))
-            elif _type is 'sr':
+            elif _type == 'sr':
                 text_list = target_list['sr']
                 await get_sr_node_images(launch, html, text_list)
                 logger.info("崩铁未来信息加载完成")
@@ -245,11 +245,11 @@ async def get_images(sections):
 
 
 async def get_versions(launch: Browser, _type: str, bot: Bot = None):
-    if _type is 'gs':
+    if _type == 'gs':
         msg = await get_version(launch, WIKI_GS_CHANGE_URL)
         logger.info(f"原神改动获取成功,{msg}")
         await send(bot, f"原神改动获取成功,{msg}")
-    elif _type is 'sr':
+    elif _type == 'sr':
         msg = await get_version(launch, WIKI_SR_CHANGE_URL)
         logger.info(f"崩铁改动获取成功,{msg}")
         await send(bot, f"崩铁改动获取成功,{msg}")
@@ -267,8 +267,11 @@ async def to_images(page, selector_targets: List[str], path: str):
     images = []
     for target in selector_targets:
         node = await get_node(page, target)
+        logger.info(f"获取node成功:{target}")
         images.append(await to_image(node))
     await splicing(images, path)
+    logger.info(f"图片拼接完成{path}")
+
 
 
 async def get_node(page, target):
@@ -285,12 +288,12 @@ async def get_future(launch, _type):
     content = ''
     try:
         await page.goto(request_url)
-        if _type is 'gs':
+        if _type == 'gs':
             await page.wait_for_function("()=>{return document.getElementsByClassName('n1').length > 0;}")
             await wait(page, "n1")
             node = await page.query_selector("body > container > div > section.n1")
             await to_future_image(node, gs_future)
-        if _type is 'sr':
+        if _type == 'sr':
             await page.wait_for_function("()=>{return document.getElementsByClassName('n2').length > 0;}")
             await page.click(selector="body > container > div > section.home_select > schedule:nth-child(2)")
             await wait(page, "n2")
@@ -406,5 +409,5 @@ async def to_image(node: ElementHandle):
 
 
 if __name__ == '__main__':
-    asyncio.run(refresh_data())
+    asyncio.run(refresh_data('sr'))
     # asyncio.run(screen_shot('/gi/char/Varesa',  "test"))
