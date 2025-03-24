@@ -224,10 +224,10 @@ async def get_images(sections):
 async def get_versions(launch: Browser, bot: Bot = None):
     msg = await get_version(launch, WIKI_GS_CHANGE_URL)
     logger.info(f"原神改动获取成功,{msg}")
-    await send(bot, msg)
+    await send(bot, f"原神改动获取成功,{msg}")
     msg = await get_version(launch, WIKI_SR_CHANGE_URL)
     logger.info(f"崩铁改动获取成功,{msg}")
-    await send(bot, msg)
+    await send(bot, f"崩铁改动获取成功,{msg}")
 
 
 async def set_max_view(page, target):
