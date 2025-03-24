@@ -25,11 +25,12 @@ versions = Path.joinpath(FUTURE_PATH, 'versions')
 sr_future = Path.joinpath(FUTURE_PATH, 'sr_future')
 data_future = Path.joinpath(FUTURE_PATH, 'data')
 
-lock = threading.Lock()
+lock1 = threading.Lock()
+lock2 = threading.Lock()
 
 
 async def refresh_data(_type: str, bot: Bot = None):
-    if lock.acquire(timeout=5):
+    if lock1.acquire(timeout=5):
         try:
             await send(bot, "已经启动刷新程序，请等待处理！！！")
             playwright = await async_playwright().start()
@@ -45,7 +46,7 @@ async def refresh_data(_type: str, bot: Bot = None):
             await send(bot, "启动launch")
         except Exception as e:
             logger.exception(e)
-            lock.release()
+            lock1.release()
             return
         try:
             page_source = await get_future(launch, _type)
@@ -72,7 +73,37 @@ async def refresh_data(_type: str, bot: Bot = None):
         finally:
             await launch.close()
             await playwright.stop()
-            lock.release()
+            lock1.release()
+    else:
+        await bot.send("程序已经启动了")
+
+async def get_future_update(_type: str, bot: Bot = None):
+    if lock2.acquire(timeout=5):
+        try:
+            await send(bot, "已经启动刷新程序，请等待处理！！！")
+            playwright = await async_playwright().start()
+            await send(bot, "启动playwright")
+            os_name = platform.system()
+            if os_name.lower() == 'windows':
+                launch = await playwright.chromium.launch(headless=True)
+            elif os_name.lower() == 'linux':
+                launch = await playwright.chromium.launch(executable_path=executable_path, headless=True)
+            else:
+                logger.error("当前系统不支持")
+                return await send(bot, "当前系统不支持")
+            await send(bot, "启动launch")
+        except Exception as e:
+            logger.exception(e)
+            lock1.release()
+            return
+        try:
+            await get_versions(launch, _type, bot)
+        except Exception as e:
+            logger.exception(e)
+        finally:
+            await launch.close()
+            await playwright.stop()
+            lock1.release()
     else:
         await bot.send("程序已经启动了")
 

@@ -73,3 +73,10 @@ async def get_refresh_data(bot: Bot, ev: Event):
     texts = ev.text.strip().split(" ")
     _type = 'gs' if texts[0] == '原神' else 'sr'
     threading.Thread(target=lambda: asyncio.run(refresh_data(_type, bot)), daemon=True).start()
+
+@sv_wiki.on_prefix("获取版本更新")
+async def get_future_update(bot: Bot, ev: Event):
+    texts = ev.text.strip().split(" ")
+    _type = 'gs' if texts[0] == '原神' else 'sr'
+    threading.Thread(target=lambda: asyncio.run(core.get_future_update(_type, bot)), daemon=True).start()
+
