@@ -11,6 +11,8 @@ from bs4 import BeautifulSoup
 from PIL import Image
 from io import BytesIO
 
+from tomlkit import value
+
 from gsuid_core.plugins.amineUID.amineUID.model.wiki import WikiBind
 from gsuid_core.logger import logger
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import WIKI_URL, FUTURE_PATH, WIKI_GS_CHANGE_URL, \
@@ -78,11 +80,16 @@ async def get_gs_node_images(launch, html, text_list):
         url_split = target.split('/')
         avatar_target = get_avatar_target(html, text)
         avatar_split = avatar_target.split("/")
-        await WikiBind.full_insert_data(name=text, value=url_split[len(url_split) - 1], type="gs",
-                                        avatar=avatar_split[len(avatar_split) - 1])
+        await insert_wiki_bind(url_split[len(url_split) - 1], text, avatar_split[len(avatar_split) - 1], 'gs')
         logger.info("处理{}数据", text)
         await gs_screen_shot(launch, target, text)
         logger.info("{}数据处理完成", text)
+
+
+async def insert_wiki_bind(_value, text, avatar, _type):
+    wiki_bind = await WikiBind.base_select_data(value=_value)
+    if wiki_bind is None:
+        await WikiBind.full_insert_data(name=text, value=_value, type=_type, avatar=avatar)
 
 
 async def get_sr_node_images(launch, html, text_list):
@@ -91,8 +98,7 @@ async def get_sr_node_images(launch, html, text_list):
         url_split = target.split('/')
         avatar_target = get_avatar_target(html, text)
         avatar_split = avatar_target.split("/")
-        await WikiBind.full_insert_data(name=text, value=url_split[len(url_split) - 1], type="sr",
-                                        avatar=avatar_split[len(avatar_split) - 1])
+        await insert_wiki_bind(url_split[len(url_split) - 1], text, avatar_split[len(avatar_split) - 1], 'sr')
         logger.info("处理{}数据", text)
         await sr_screen_shot(launch, target, text)
         logger.info("{}数据处理完成", text)
