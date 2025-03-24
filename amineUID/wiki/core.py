@@ -128,6 +128,7 @@ async def sr_screen_shot(launch, url: str, name: str):
         await page.evaluate("document.body.style.zoom='0.1'")
         await wait(page, "mon_body")
         await page.evaluate("document.body.style.zoom='1'")
+        logger.info(f"页面加载完成{request_url}")
         await set_max_view(page, "#content_2")
         if data_future.exists() is False:
             data_future.mkdir()
