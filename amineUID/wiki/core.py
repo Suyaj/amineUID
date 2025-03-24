@@ -127,7 +127,7 @@ async def sr_screen_shot(launch, url: str, name: str):
                                 "#content_2 > div > div:nth-child(3)"]
         await page.evaluate("document.body.style.zoom='0.05'")
         await wait(page, "mon_body")
-        await page.evaluate("document.body.style.zoom='1'")
+        await page.evaluate("document.body.style.zoom='0.8'")
         logger.info(f"页面加载完成{request_url}")
         await set_max_view(page, "#content_2")
         if data_future.exists() is False:
