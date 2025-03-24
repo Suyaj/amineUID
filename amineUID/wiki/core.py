@@ -404,7 +404,7 @@ async def splicing(images: List[Image], path: str):
 
 
 async def to_image(node: ElementHandle):
-    binary_data = await node.screenshot(timeout=60000)
+    binary_data = await node.screenshot(timeout=90000)
     image_data = BytesIO(binary_data)
     img = Image.open(image_data)
     return img
