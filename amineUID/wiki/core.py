@@ -201,7 +201,7 @@ async def save_images(image_map, version: str):
         bind = await WikiBind.base_select_data(avatar=avatar)
         avatar_path = Path.joinpath(versions, bind.name)
         avatar_path.mkdir(parents=True, exist_ok=True)
-        await splicing(images, str(Path.joinpath(avatar_path, f'V{version}')).rstrip("\\"))
+        await splicing(images, str(Path.joinpath(avatar_path, version)).rstrip("\\"))
 
 
 async def get_images(sections):
