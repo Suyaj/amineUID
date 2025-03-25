@@ -3,7 +3,7 @@ import base64
 import jmcomic, os, yaml
 from jmcomic import ZipPlugin, JmModuleConfig, Img2pdfPlugin, JmPhotoDetail, JmAlbumDetail, jm_log, DirRule
 
-from amineUID.utils.contants import JM_PATH
+from gsuid_core.plugins.amineUID.amineUID.utils.contants import JM_PATH
 
 
 class ZipEnhancedPlugin(ZipPlugin):
