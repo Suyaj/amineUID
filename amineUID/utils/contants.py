@@ -8,6 +8,7 @@ from gsuid_core.data_store import get_res_path
 MAIN_PATH = Path.joinpath(get_res_path(), "amineUID")
 IMAGES_PATH = Path.joinpath(MAIN_PATH, "images")
 FUTURE_PATH = Path.joinpath(MAIN_PATH, "futures")
+JM_PATH = Path.joinpath(MAIN_PATH, "jm")
 
 # cos
 COS_BASE = "https://a2cy.com"

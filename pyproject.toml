@@ -13,6 +13,10 @@ requests = "^2.32.3"
 pillow = ">=9.2.0, <=10.2.0"
 playwright = "^1.51.0"
 pixivpy3 = "^3.7.5"
+jmcomic = "^2.5.32"
+zhconv = "^1.4.3"
+img2pdf = "^0.6.0"
+pyzipper = "^0.3.6"
 
 [[tool.poetry.source]]
 name = "USTC"
