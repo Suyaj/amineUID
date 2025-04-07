@@ -24,8 +24,7 @@ async def download(bot: Bot, ev: Event):
     album_id = texts[0]
     try:
         get_album_zip(album_id)
-        msg = MessageSegment.file("https://docs.sayu-bot.com/bg.png", f"{album_id}.zip")
-        await bot.send(msg)
+        await bot.send("成功")
     except Exception as e:
         logger.error(e)
         await bot.send("数据出现问题")
