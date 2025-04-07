@@ -3,6 +3,7 @@ import base64
 import jmcomic, os, yaml
 from jmcomic import ZipPlugin, JmModuleConfig, Img2pdfPlugin, JmPhotoDetail, JmAlbumDetail, jm_log, DirRule
 
+from gsuid_core.logger import logger
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import JM_PATH
 
 
@@ -26,7 +27,7 @@ class ZipEnhancedPlugin(ZipPlugin):
                 file_path = os.path.join(album_dir, pdf)
                 f.write(filename=file_path, arcname=pdf)
                 path_to_delete.append(file_path)
-        self.log(f'压缩本子[{album.album_id}]成功 → {zip_path}', 'finish')
+        logger.info(f'压缩本子[{album.album_id}]成功 → {zip_path}', 'finish')
 
 
 class Img2pdfEnhancedPlugin(Img2pdfPlugin):
@@ -40,6 +41,7 @@ class Img2pdfEnhancedPlugin(Img2pdfPlugin):
         try:
             import img2pdf
         except ImportError:
+            logger.warning("缺少img2pdf")
             self.warning_lib_not_install('img2pdf')
             return
 
@@ -56,7 +58,7 @@ class Img2pdfEnhancedPlugin(Img2pdfPlugin):
 
         # 调用 img2pdf 把 photo_dir 下的所有图片转为pdf
         img_path_ls, img_dir_ls = self.write_img_2_pdf(pdf_filepath, album, photo)
-        self.log(f'Convert Successfully: JM{album or photo} → {pdf_filepath}')
+        logger.info(f'Convert Successfully: JM{album or photo} → {pdf_filepath}')
 
         # 执行删除
         img_path_ls += img_dir_ls
