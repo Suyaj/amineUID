@@ -469,14 +469,14 @@ reference = "USTC"
 
 [[package]]
 name = "jmcomic"
-version = "2.5.32"
+version = "2.5.34"
 description = "Python API For JMComic (禁漫天堂)"
 optional = false
 python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "jmcomic-2.5.32-py3-none-any.whl", hash = "sha256:98c7156ff584e6fe5892cc58420bf5a5cc16a28785285d094ba02f53273ad9bd"},
-    {file = "jmcomic-2.5.32.tar.gz", hash = "sha256:fb77281e25b733641a36c5906d660b4b824e19d3176fff5f47d35ca5dfd0ef22"},
+    {file = "jmcomic-2.5.34-py3-none-any.whl", hash = "sha256:3a6a91156889e4fed2b993e17a7117f408c70fe86201cc31b4a74c76e7933a55"},
+    {file = "jmcomic-2.5.34.tar.gz", hash = "sha256:8eb8f5c2996012daed156185a6e2a796394a6134faa2c1c7f453b589c8b45e7d"},
 ]
 
 [package.dependencies]
@@ -1329,4 +1329,4 @@ reference = "USTC"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4.0"
-content-hash = "13fc4003cb91609ae9edae0b25e1798ac4168f2b0125bd13b0368154d6bc2072"
+content-hash = "7fe404686ff4b26e4663ef987a5af32b96fe8a756da885195037a959fb8c84f5"
