@@ -97,6 +97,7 @@ def default_jm_logging(topic: str, msg: str):
 if __name__ == "__main__":
     JmModuleConfig.register_plugin(ZipEnhancedPlugin)
     JmModuleConfig.register_plugin(Img2pdfEnhancedPlugin)
+    JmModuleConfig.EXECUTOR_LOG = default_jm_logging
     # 自定义设置：
     album_zip = get_album_zip(544188)
     print("结束")

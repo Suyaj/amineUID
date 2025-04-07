@@ -2,8 +2,8 @@ import os
 
 from jmcomic import JmModuleConfig
 
-from amineUID.pixiv.jm import default_jm_logging
-from gsuid_core.plugins.amineUID.amineUID.pixiv.jm import ZipEnhancedPlugin, Img2pdfEnhancedPlugin, get_album_zip
+from gsuid_core.plugins.amineUID.amineUID.pixiv.jm import ZipEnhancedPlugin, Img2pdfEnhancedPlugin, get_album_zip, \
+    default_jm_logging
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import JM_PATH
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
