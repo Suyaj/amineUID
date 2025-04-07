@@ -2,16 +2,17 @@ import os
 
 from jmcomic import JmModuleConfig
 
+from amineUID.pixiv.jm import default_jm_logging
 from gsuid_core.plugins.amineUID.amineUID.pixiv.jm import ZipEnhancedPlugin, Img2pdfEnhancedPlugin, get_album_zip
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import JM_PATH
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
 from gsuid_core.models import Event
-from gsuid_core.segment import MessageSegment
 from gsuid_core.sv import SV
 
 JmModuleConfig.register_plugin(ZipEnhancedPlugin)
 JmModuleConfig.register_plugin(Img2pdfEnhancedPlugin)
+JmModuleConfig.EXECUTOR_LOG = default_jm_logging
 os.makedirs(JM_PATH, exist_ok=True)
 
 sv_wiki = SV("pixiv")

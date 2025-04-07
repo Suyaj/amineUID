@@ -91,6 +91,9 @@ def file_to_base64(file_path):
         return 'base64://' + base64_string
 
 
+def default_jm_logging(topic: str, msg: str):
+    logger.info(f"topic: {topic}, msg: {msg}")
+
 if __name__ == "__main__":
     JmModuleConfig.register_plugin(ZipEnhancedPlugin)
     JmModuleConfig.register_plugin(Img2pdfEnhancedPlugin)
