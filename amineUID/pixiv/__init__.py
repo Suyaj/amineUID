@@ -2,7 +2,7 @@ import os
 
 from jmcomic import JmModuleConfig
 
-from gsuid_core.plugins.amineUID.amineUID.pixiv.jm import ZipEnhancedPlugin, Img2pdfEnhancedPlugin, get_album_zip, \
+from gsuid_core.plugins.amineUID.amineUID.pixiv.jm import ZipEnhancedPlugin, Img2pdfEnhancedPlugin, get_album, \
     default_jm_logging
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import JM_PATH
 from gsuid_core.bot import Bot
@@ -14,6 +14,7 @@ JmModuleConfig.register_plugin(ZipEnhancedPlugin)
 JmModuleConfig.register_plugin(Img2pdfEnhancedPlugin)
 JmModuleConfig.EXECUTOR_LOG = default_jm_logging
 os.makedirs(JM_PATH, exist_ok=True)
+BASE_HTTP = "http://121.40.208.220:5244/"
 
 sv_wiki = SV("pixiv")
 
@@ -24,8 +25,8 @@ async def download(bot: Bot, ev: Event):
     texts = ev.text.strip().split(" ")
     album_id = texts[0]
     try:
-        get_album_zip(album_id)
-        await bot.send("成功")
+        album = get_album(album_id)
+        await bot.send(["成功", f"访问地址：{BASE_HTTP}{album.name}"])
     except Exception as e:
         logger.error(e)
         await bot.send("数据出现问题")

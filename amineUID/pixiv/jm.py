@@ -65,7 +65,7 @@ class Img2pdfEnhancedPlugin(Img2pdfPlugin):
         self.execute_deletion(img_path_ls)
 
 
-def get_album_zip(album_id):
+def get_album(album_id):
     config = os.path.join(JM_PATH, 'option.yml')
     loadConfig = JmOption.from_file(config)
     client = JmOption.default().new_jm_client()
@@ -76,6 +76,7 @@ def get_album_zip(album_id):
         file_path = os.path.join(path, str(album.name))
         if os.path.exists(file_path):
             print("文件：《%s》 已存在，跳过" % album.name)
+            return album
         else:
             print("开始转换：%s " % album_id)
             album, download = jmcomic.download_album(album_id, loadConfig)
@@ -101,5 +102,5 @@ if __name__ == "__main__":
     JmModuleConfig.register_plugin(Img2pdfEnhancedPlugin)
     JmModuleConfig.EXECUTOR_LOG = default_jm_logging
     # 自定义设置：
-    album_zip = get_album_zip(544188)
+    album_zip = get_album(544188)
     print("结束")
