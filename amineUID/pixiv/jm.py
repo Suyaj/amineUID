@@ -1,7 +1,7 @@
 import base64
 
 import jmcomic, os, yaml
-from jmcomic import ZipPlugin, JmModuleConfig, Img2pdfPlugin, JmPhotoDetail, JmAlbumDetail, jm_log, DirRule
+from jmcomic import ZipPlugin, JmModuleConfig, Img2pdfPlugin, JmPhotoDetail, JmAlbumDetail, jm_log, DirRule, JmOption
 
 from gsuid_core.logger import logger
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import JM_PATH
@@ -67,13 +67,15 @@ class Img2pdfEnhancedPlugin(Img2pdfPlugin):
 
 def get_album_zip(album_id):
     config = os.path.join(JM_PATH, 'option.yml')
-    loadConfig = jmcomic.JmOption.from_file(config)
+    loadConfig = JmOption.from_file(config)
+    client = JmOption.default().new_jm_client()
+    album = client.get_album_detail(album_id)
     with open(config, "r", encoding="utf8") as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
         path = data["dir_rule"]["base_dir"]
-        file_path = os.path.join(path, str(album_id) + ".zip")
+        file_path = os.path.join(path, str(album.name))
         if os.path.exists(file_path):
-            print("文件：《%s》 已存在，跳过" % album_id)
+            print("文件：《%s》 已存在，跳过" % album.name)
         else:
             print("开始转换：%s " % album_id)
             album, download = jmcomic.download_album(album_id, loadConfig)
