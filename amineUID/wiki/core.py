@@ -19,7 +19,7 @@ from gsuid_core.bot import Bot
 
 time_out = 60
 host = WIKI_URL
-executable_path = '/root/.cache/ms-playwright/chromium_headless_shell-1161/chrome-linux/headless_shell'
+executable_path = None
 gs_future = Path.joinpath(FUTURE_PATH, 'gs_future')
 versions = Path.joinpath(FUTURE_PATH, 'versions')
 sr_future = Path.joinpath(FUTURE_PATH, 'sr_future')
