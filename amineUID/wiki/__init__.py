@@ -6,7 +6,7 @@ from PIL import Image
 
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import FUTURE_PATH
 from gsuid_core.plugins.amineUID.amineUID.wiki.core import get_future, refresh_data
-from gsuid_core.plugins.WutheringWavesUID.WutheringWavesUID.wutheringwaves_newsign import get_sign_func
+# from gsuid_core.plugins.WutheringWavesUID.WutheringWavesUID.wutheringwaves_newsign import get_sign_func
 from gsuid_core.plugins.ZZZeroUID.ZZZeroUID.utils.hint import BIND_UID_HINT
 from gsuid_core.sv import SV
 from gsuid_core.bot import Bot
@@ -38,8 +38,8 @@ async def get_all_sign_func(bot: Bot, ev: Event):
         return await bot.send(BIND_UID_HINT)
     await bot.send(await sign_in(uid, 'zzz'))
     # ww签到
-    msg = await get_sign_func(bot, ev)
-    await bot.send(msg)
+    # msg = await get_sign_func(bot, ev)
+    # await bot.send(msg)
 
 
 @sv_wiki.on_prefix('未来数据')
