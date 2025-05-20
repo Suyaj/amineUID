@@ -1,7 +1,8 @@
 import base64
 
 import jmcomic, os, yaml
-from jmcomic import ZipPlugin, JmModuleConfig, Img2pdfPlugin, JmPhotoDetail, JmAlbumDetail, jm_log, DirRule, JmOption
+from jmcomic import ZipPlugin, JmModuleConfig, Img2pdfPlugin, JmPhotoDetail, JmAlbumDetail, jm_log, DirRule, JmOption, \
+    JmSearchPage
 
 from gsuid_core.logger import logger
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import JM_PATH
@@ -94,6 +95,15 @@ def file_to_base64(file_path):
         return 'base64://' + base64_string
 
 
+def search(title: str, page: int = 1):
+    client = JmOption.default().new_jm_client()
+    page: JmSearchPage = client.search_site(search_query=title, page=page)
+    for index in range(1, page.page_size):
+        album = page.getindex(index)
+        album_id, album_name = album
+        print(f'{index}:[{album_id}]: {album_name}')
+
+
 def default_jm_logging(topic: str, msg: str):
     logger.info(f"topic: {topic}, msg: {msg}")
 
@@ -102,5 +112,6 @@ if __name__ == "__main__":
     JmModuleConfig.register_plugin(Img2pdfEnhancedPlugin)
     JmModuleConfig.EXECUTOR_LOG = default_jm_logging
     # 自定义设置：
-    album_zip = get_album(544188)
+    # album_zip = get_album(544188)
+    search("MANA")
     print("结束")
