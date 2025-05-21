@@ -106,6 +106,7 @@ def search(title: str, page: int = 1) -> JmSearchPage:
 def default_jm_logging(topic: str, msg: str):
     logger.info(f"topic: {topic}, msg: {msg}")
 
+
 if __name__ == "__main__":
     JmModuleConfig.register_plugin(ZipEnhancedPlugin)
     JmModuleConfig.register_plugin(Img2pdfEnhancedPlugin)

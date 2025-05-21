@@ -55,6 +55,7 @@ async def search(bot: Bot, ev: Event):
         index = resp.text
         if index == 'all':
             search_path = Path.joinpath(JM_PATH, "search_content")
+            os.makedirs(search_path, exist_ok=True)
             for i in range(0, len(contents.content)):
                 album = contents.getindex(i)
                 album_id = album[0]
