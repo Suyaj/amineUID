@@ -51,7 +51,7 @@ async def search(bot: Bot, ev: Event):
     )
     if resp is not None:
         index = resp.text
-        album = contents.getindex(index)
+        album = contents.getindex(int(index))
         album_id, album_name = album
         album = get_album(album_id)
         await bot.send(["获取成功", f"访问地址：{BASE_HTTP}{album.name}"])
