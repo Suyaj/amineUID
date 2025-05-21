@@ -35,7 +35,9 @@ async def download(bot: Bot, ev: Event):
 async def search(bot: Bot, ev: Event):
     texts = ev.text.strip().split(" ")
     search_content = texts[0]
-    page = texts[1]
+    page = 1
+    if len(texts) == 2:
+        page = texts[1]
     contents = await jm.search(search_content, page=int(page))
     msg_list = []
     for index in range(1, contents.page_size):
