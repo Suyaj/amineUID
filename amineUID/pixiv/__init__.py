@@ -41,7 +41,7 @@ async def search(bot: Bot, ev: Event):
         page = texts[1]
     contents = jm_search(search_content, page=int(page))
     msg_list = []
-    for i in range(1, contents.page_size):
+    for i in range(0, len(contents.content)):
         album = contents.getindex(i)
         album_id, album_name = album
         name = album_name['name']
@@ -54,7 +54,7 @@ async def search(bot: Bot, ev: Event):
         index = resp.text
         if index == 'all' :
             search_path = Path.joinpath(JM_PATH, "search_content")
-            for i in range(1, contents.page_size):
+            for i in range(0, len(contents.content)):
                 album = contents.getindex(i)
                 album_id = album.album_id
                 get_album(album_id, search_path)
