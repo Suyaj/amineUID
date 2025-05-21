@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from jmcomic import JmModuleConfig
 
@@ -51,7 +52,15 @@ async def search(bot: Bot, ev: Event):
     )
     if resp is not None:
         index = resp.text
-        album = contents.getindex(int(index))
-        album_id, album_name = album
-        album = get_album(album_id)
-        await bot.send(["获取成功", f"访问地址：{BASE_HTTP}{album.name}"])
+        if index == 'all' :
+            search_path = Path.joinpath(JM_PATH, "search_content")
+            for index in range(1, contents.page_size):
+                album = contents.getindex(index)
+                album_id = album.album_id
+                get_album(album_id, search_path)
+            await bot.send(["获取成功", f"访问地址：{BASE_HTTP}jm/{search_content}"])
+        else:
+            album = contents.getindex(int(index))
+            album_id, album_name = album
+            album = get_album(album_id)
+            await bot.send(["获取成功", f"访问地址：{BASE_HTTP}{album.name}"])

@@ -66,9 +66,11 @@ class Img2pdfEnhancedPlugin(Img2pdfPlugin):
         self.execute_deletion(img_path_ls)
 
 
-def get_album(album_id):
+def get_album(album_id, pdf_dir=None):
     config = os.path.join(JM_PATH, 'option.yml')
-    loadConfig = JmOption.from_file(config)
+    load_config = JmOption.from_file(config)
+    if pdf_dir is not None:
+        load_config.plugins.get("after_photo")[0]['kwargs']['pdf_dir'] = pdf_dir
     client = JmOption.default().new_jm_client()
     album = client.get_album_detail(album_id)
     with open(config, "r", encoding="utf8") as f:
@@ -80,7 +82,7 @@ def get_album(album_id):
             return album
         else:
             print("开始转换：%s " % album_id)
-            album, download = jmcomic.download_album(album_id, loadConfig)
+            album, download = jmcomic.download_album(album_id, load_config)
             return album
 
 
