@@ -95,7 +95,7 @@ def file_to_base64(file_path):
         return 'base64://' + base64_string
 
 
-def search(title: str, page: int = 1):
+def search(title: str, page: int = 1) -> JmSearchPage:
     client = JmOption.default().new_jm_client()
     page: JmSearchPage = client.search_site(search_query=title, page=page)
     return page
