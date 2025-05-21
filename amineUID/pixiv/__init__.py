@@ -3,7 +3,7 @@ import os
 from jmcomic import JmModuleConfig
 
 from gsuid_core.plugins.amineUID.amineUID.pixiv.jm import ZipEnhancedPlugin, Img2pdfEnhancedPlugin, get_album, \
-    default_jm_logging
+    default_jm_logging, search as jm_search
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import JM_PATH
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
@@ -38,7 +38,7 @@ async def search(bot: Bot, ev: Event):
     page = 1
     if len(texts) == 2:
         page = texts[1]
-    contents = await jm.search(search_content, page=int(page))
+    contents = await jm_search(search_content, page=int(page))
     msg_list = []
     for index in range(1, contents.page_size):
         album = contents.getindex(index)
