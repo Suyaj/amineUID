@@ -32,6 +32,7 @@ async def download(bot: Bot, ev: Event):
         logger.error(e)
         await bot.send("数据出现问题")
 
+
 @sv_wiki.on_prefix("搜索")
 async def search(bot: Bot, ev: Event):
     texts = ev.text.strip().split(" ")
@@ -52,11 +53,11 @@ async def search(bot: Bot, ev: Event):
     )
     if resp is not None:
         index = resp.text
-        if index == 'all' :
+        if index == 'all':
             search_path = Path.joinpath(JM_PATH, "search_content")
             for i in range(0, len(contents.content)):
                 album = contents.getindex(i)
-                album_id = album.album_id
+                album_id = album[0]
                 get_album(album_id, search_path)
             await bot.send(["获取成功", f"访问地址：{BASE_HTTP}jm/{search_content}"])
         else:
