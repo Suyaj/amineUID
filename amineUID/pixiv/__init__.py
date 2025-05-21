@@ -59,7 +59,7 @@ async def search(bot: Bot, ev: Event):
             for i in range(0, len(contents.content)):
                 album = contents.getindex(i)
                 album_id = album[0]
-                get_album(album_id, search_path)
+                get_album(album_id, str(search_path))
             await bot.send(["获取成功", f"访问地址：{BASE_HTTP}jm/{search_content}"])
         else:
             album = contents.getindex(int(index))
