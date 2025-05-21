@@ -38,7 +38,7 @@ async def search(bot: Bot, ev: Event):
     page = 1
     if len(texts) == 2:
         page = texts[1]
-    contents = await jm_search(search_content, page=int(page))
+    contents = jm_search(search_content, page=int(page))
     msg_list = []
     for index in range(1, contents.page_size):
         album = contents.getindex(index)
