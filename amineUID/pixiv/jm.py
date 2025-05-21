@@ -98,10 +98,7 @@ def file_to_base64(file_path):
 def search(title: str, page: int = 1):
     client = JmOption.default().new_jm_client()
     page: JmSearchPage = client.search_site(search_query=title, page=page)
-    for index in range(1, page.page_size):
-        album = page.getindex(index)
-        album_id, album_name = album
-        print(f'{index}:[{album_id}]: {album_name}')
+    return page
 
 
 def default_jm_logging(topic: str, msg: str):

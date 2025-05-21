@@ -30,3 +30,25 @@ async def download(bot: Bot, ev: Event):
     except Exception as e:
         logger.error(e)
         await bot.send("数据出现问题")
+
+@sv_wiki.on_prefix("搜索")
+async def search(bot: Bot, ev: Event):
+    texts = ev.text.strip().split(" ")
+    search_content = texts[0]
+    page = texts[1]
+    contents = await jm.search(search_content, page=int(page))
+    msg_list = []
+    for index in range(1, contents.page_size):
+        album = contents.getindex(index)
+        album_id, album_name = album
+        msg_list.append(f'{index}:[{album_id}]: {album_name}')
+    await bot.send(msg_list)
+    resp = await bot.receive_resp(
+        '请选择获取的编号',
+    )
+    if resp is not None:
+        index = resp.text
+        album = contents.getindex(index)
+        album_id, album_name = album
+        album = get_album(album_id)
+        await bot.send(["获取成功", f"访问地址：{BASE_HTTP}{album.name}"])

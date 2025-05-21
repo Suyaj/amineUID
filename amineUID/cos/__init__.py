@@ -78,9 +78,12 @@ async def get_cos_images(bot: Bot, ev: Event):
                 logger.info(f"目录地址：{cos[1]}")
                 images = await get_cos(cos[0], cos[1])
             await bot.send(images)
+            return None
         except Exception as e:
             logger.error(e)
             await bot.send('输入错误')
+            return None
+    return None
 
 
 @sv_am_get_cos_images.on_fullmatch("获取图片")
