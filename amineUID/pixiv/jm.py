@@ -1,4 +1,5 @@
 import base64
+import tempfile
 
 import jmcomic, os, yaml
 from jmcomic import ZipPlugin, JmModuleConfig, Img2pdfPlugin, JmPhotoDetail, JmAlbumDetail, jm_log, DirRule, JmOption, \
@@ -68,22 +69,29 @@ class Img2pdfEnhancedPlugin(Img2pdfPlugin):
 
 def get_album(album_id, pdf_dir=None):
     config = os.path.join(JM_PATH, 'option.yml')
-    load_config = JmOption.from_file(config)
-    if pdf_dir is not None:
-        load_config.plugins.get("after_photo")[0]['kwargs']['pdf_dir'] = pdf_dir
-    client = JmOption.default().new_jm_client()
-    album = client.get_album_detail(album_id)
+
     with open(config, "r", encoding="utf8") as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
         path = data["dir_rule"]["base_dir"]
-        file_path = os.path.join(path, str(album.name))
-        if os.path.exists(file_path):
-            print("文件：《%s》 已存在，跳过" % album.name)
-            return album
-        else:
-            print("开始转换：%s " % album_id)
-            album, download = jmcomic.download_album(album_id, load_config)
-            return album
+        if pdf_dir is not None:
+            data['dir_rule']['base_dir'] = pdf_dir
+            data['plugins']['after_photo'][0]['kwargs']['pdf_dir'] = pdf_dir
+        with tempfile.TemporaryFile(mode='w+b', suffix='.yml', delete=False) as tmp_file:
+            tmp_file.write(yaml.dump(data).encode('utf-8'))
+            tmp_file_path = tmp_file.name
+            tmp_file.close()
+            load_config = JmOption.from_file(tmp_file_path)
+            os.remove(tmp_file_path)
+            client = JmOption.default().new_jm_client()
+            album = client.get_album_detail(album_id)
+            file_path = os.path.join(path, str(album.name))
+            if os.path.exists(file_path):
+                print("文件：《%s》 已存在，跳过" % album.name)
+                return album
+            else:
+                print("开始转换：%s " % album_id)
+                album, download = jmcomic.download_album(album_id, option=load_config)
+                return album
 
 
 def file_to_base64(file_path):
