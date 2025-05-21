@@ -76,7 +76,7 @@ def get_album(album_id, pdf_dir=None):
         if pdf_dir is not None:
             data['dir_rule']['base_dir'] = pdf_dir
             data['plugins']['after_photo'][0]['kwargs']['pdf_dir'] = pdf_dir
-        with tempfile.TemporaryFile(mode='w+b', suffix='.yml', delete=False) as tmp_file:
+        with tempfile.NamedTemporaryFile(mode='w+b', suffix='.yml', delete=False) as tmp_file:
             tmp_file.write(yaml.dump(data).encode('utf-8'))
             tmp_file_path = tmp_file.name
             tmp_file.close()
