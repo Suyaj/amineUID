@@ -43,7 +43,8 @@ async def search(bot: Bot, ev: Event):
     for index in range(1, contents.page_size):
         album = contents.getindex(index)
         album_id, album_name = album
-        msg_list.append(f'{index}:[{album_id}]: {album_name}')
+        name = album_name['name']
+        msg_list.append(f'{index}:[{album_id}]: {name}')
     await bot.send(msg_list)
     resp = await bot.receive_resp(
         '请选择获取的编号',
