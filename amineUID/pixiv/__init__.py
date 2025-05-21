@@ -41,11 +41,11 @@ async def search(bot: Bot, ev: Event):
         page = texts[1]
     contents = jm_search(search_content, page=int(page))
     msg_list = []
-    for index in range(1, contents.page_size):
-        album = contents.getindex(index)
+    for i in range(1, contents.page_size):
+        album = contents.getindex(i)
         album_id, album_name = album
         name = album_name['name']
-        msg_list.append(f'{index}:[{album_id}]: {name}')
+        msg_list.append(f'{i}:[{album_id}]: {name}')
     await bot.send(msg_list)
     resp = await bot.receive_resp(
         '请选择获取的编号',
@@ -54,8 +54,8 @@ async def search(bot: Bot, ev: Event):
         index = resp.text
         if index == 'all' :
             search_path = Path.joinpath(JM_PATH, "search_content")
-            for index in range(1, contents.page_size):
-                album = contents.getindex(index)
+            for i in range(1, contents.page_size):
+                album = contents.getindex(i)
                 album_id = album.album_id
                 get_album(album_id, search_path)
             await bot.send(["获取成功", f"访问地址：{BASE_HTTP}jm/{search_content}"])
