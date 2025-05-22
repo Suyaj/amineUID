@@ -11,3 +11,4 @@ class WikiBind(BaseIDModel, table=True):
     value: Optional[str] = Field(default="", title="值")
     type: Optional[str] = Field(default="", title="类型")
     avatar: Optional[str] = Field(default="", title="头像")
+    version: Optional[str] = Field(default="", title="版本")
