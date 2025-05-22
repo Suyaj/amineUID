@@ -108,7 +108,7 @@ def transmission(pdf_dir: str):
     sftp_client = ssh_client.open_sftp()
     listdir = os.listdir(pdf_dir)
     for pdf_path in listdir:
-        transmission_one(pdf_path, sftp_client)
+        transmission_one(os.path.join(pdf_dir, pdf_path), sftp_client)
     sftp_client.close()
     ssh_client.close()
 
