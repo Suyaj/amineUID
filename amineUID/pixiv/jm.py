@@ -98,7 +98,7 @@ def get_album(album_id, pdf_dir=None):
 
 
 def transmission(pdf_dir: str):
-    config = os.path.join(JM_PATH, 'option.yml')
+    config = os.path.join(JM_PATH, 'sftp.yml')
     with open(config, "r", encoding="utf8") as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
         sftp = data['sftp']
@@ -114,7 +114,7 @@ def transmission(pdf_dir: str):
 
 
 def transmission_one(pdf_dir: str, sftp_client=None):
-    config = os.path.join(JM_PATH, 'option.yml')
+    config = os.path.join(JM_PATH, 'sftp.yml')
     with open(config, "r", encoding="utf8") as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
         sftp = data['sftp']
