@@ -3,8 +3,9 @@ from pathlib import Path
 
 from jmcomic import JmModuleConfig
 
+from amineUID.pixiv.jm import transmission_one
 from gsuid_core.plugins.amineUID.amineUID.pixiv.jm import ZipEnhancedPlugin, Img2pdfEnhancedPlugin, get_album, \
-    default_jm_logging, search as jm_search
+    default_jm_logging, search as jm_search, transmission
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import JM_PATH
 from gsuid_core.bot import Bot
 from gsuid_core.logger import logger
@@ -15,7 +16,7 @@ JmModuleConfig.register_plugin(ZipEnhancedPlugin)
 JmModuleConfig.register_plugin(Img2pdfEnhancedPlugin)
 JmModuleConfig.EXECUTOR_LOG = default_jm_logging
 os.makedirs(JM_PATH, exist_ok=True)
-BASE_HTTP = "http://121.40.208.220:5244/"
+BASE_HTTP = "http://121.40.208.220:8083/"
 
 sv_wiki = SV("pixiv")
 
@@ -60,9 +61,11 @@ async def search(bot: Bot, ev: Event):
                 album = contents.getindex(i)
                 album_id = album[0]
                 get_album(album_id, str(search_path))
-            await bot.send(["获取成功", f"访问地址：{BASE_HTTP}jm/{search_content}"])
+            transmission(search_path)
+            await bot.send(["获取成功", f"访问地址：{BASE_HTTP}"])
         else:
             album = contents.getindex(int(index))
             album_id, album_name = album
             album = get_album(album_id)
-            await bot.send(["获取成功", f"访问地址：{BASE_HTTP}{album.name}"])
+            transmission_one(Path.joinpath(JM_PATH, album.name))
+            await bot.send(["获取成功", f"访问地址：{BASE_HTTP}"])

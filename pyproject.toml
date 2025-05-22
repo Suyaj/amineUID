@@ -20,6 +20,7 @@ jmcomic = "^2.5.34"
 zhconv = "^1.4.3"
 img2pdf = "^0.6.0"
 pyzipper = "^0.3.6"
+paramiko = "^3.5.1"
 
 [[tool.poetry.source]]
 name = "USTC"
