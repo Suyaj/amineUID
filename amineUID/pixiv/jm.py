@@ -104,7 +104,7 @@ def transmission(pdf_dir: str):
         sftp = data['sftp']
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh_client.connect(hostname=sftp.host, port=22, username=sftp.name, password=sftp.password)
+    ssh_client.connect(hostname=sftp['host'], port=22, username=sftp['name'], password=sftp['password'])
     sftp_client = ssh_client.open_sftp()
     listdir = os.listdir(pdf_dir)
     for pdf_path in listdir:
@@ -123,7 +123,7 @@ def transmission_one(pdf_dir: str, sftp_client=None):
     if sftp_exist:
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname=sftp.host, port=22, username=sftp.name, password=sftp.password)
+        ssh_client.connect(hostname=sftp['host'], port=22, username=sftp['name'], password=sftp['password'])
         sftp_client = ssh_client.open_sftp()
     listdir = os.listdir(pdf_dir)
     for file in listdir:
