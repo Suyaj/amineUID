@@ -101,6 +101,7 @@ def transmission(pdf_dir: str):
     listdir = os.listdir(pdf_dir)
     for pdf_path in listdir:
         transmission_one(os.path.join(pdf_dir, pdf_path))
+    os.removedirs(pdf_dir)
 
 
 def transmission_one(pdf_dir: str, sftp_client=None):
@@ -117,7 +118,10 @@ def transmission_one(pdf_dir: str, sftp_client=None):
         sftp_client = ssh_client.open_sftp()
     listdir = os.listdir(pdf_dir)
     for file in listdir:
-        sftp_client.put(os.path.join(pdf_dir, file), os.path.join(SFTP_PATH, file))
+        file_path = os.path.join(pdf_dir, file)
+        sftp_client.put(file_path, os.path.join(SFTP_PATH, file))
+        os.remove(file_path)
+    os.removedirs(pdf_dir)
     if sftp_exist:
         sftp_client.close()
         if sftp_client is not None:
