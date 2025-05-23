@@ -3,7 +3,8 @@ from pathlib import Path
 
 from jmcomic import JmModuleConfig
 
-from amineUID.pixiv.jm import transmission_one
+from gsuid_core.plugins.amineUID.amineUID.bot import http_bot
+from gsuid_core.plugins.amineUID.amineUID.pixiv.jm import transmission_one
 from gsuid_core.plugins.amineUID.amineUID.pixiv.jm import ZipEnhancedPlugin, Img2pdfEnhancedPlugin, get_album, \
     default_jm_logging, search as jm_search, transmission
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import JM_PATH
@@ -34,13 +35,15 @@ async def download(bot: Bot, ev: Event):
         logger.error(e)
         await bot.send("数据出现问题")
 
+
 @sv_wiki.on_prefix("传输")
 async def trans(bot: Bot, ev: Event):
     texts = ev.text.strip().split(" ")
     search_content = texts[0]
     search_path = Path.joinpath(JM_PATH, search_content)
     transmission(search_path)
-    await bot.send(["传输成功", f"访问地址：{BASE_HTTP}"])
+    http_bot.send_private_msg(ev.user_id, ["传输成功", f"访问地址：{BASE_HTTP}"])
+
 
 @sv_wiki.on_prefix("搜索")
 async def search(bot: Bot, ev: Event):

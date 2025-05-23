@@ -9,6 +9,7 @@ MAIN_PATH = Path.joinpath(get_res_path(), "amineUID")
 IMAGES_PATH = Path.joinpath(MAIN_PATH, "images")
 FUTURE_PATH = Path.joinpath(MAIN_PATH, "futures")
 JM_PATH = Path.joinpath(MAIN_PATH, "jm")
+BOT_PATH = Path.joinpath(MAIN_PATH, "bot.yml")
 
 # cos
 COS_BASE = "https://a2cy.com"
