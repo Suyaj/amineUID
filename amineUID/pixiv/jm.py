@@ -119,6 +119,7 @@ def transmission_one(pdf_dir: str, sftp_client=None):
     listdir = os.listdir(pdf_dir)
     for file in listdir:
         file_path = os.path.join(pdf_dir, file)
+        logger.info(f"传输文件{file_path}")
         sftp_client.put(file_path, os.path.join(SFTP_PATH, file))
         os.remove(file_path)
     os.removedirs(pdf_dir)
