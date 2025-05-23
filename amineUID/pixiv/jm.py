@@ -101,7 +101,8 @@ def transmission(pdf_dir: str):
     listdir = os.listdir(pdf_dir)
     for pdf_path in listdir:
         transmission_one(os.path.join(pdf_dir, pdf_path))
-    os.removedirs(pdf_dir)
+    if os.path.exists(pdf_dir):
+        os.removedirs(pdf_dir)
 
 
 def transmission_one(pdf_dir: str, sftp_client=None):
