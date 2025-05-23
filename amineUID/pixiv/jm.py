@@ -98,19 +98,9 @@ def get_album(album_id, pdf_dir=None):
 
 
 def transmission(pdf_dir: str):
-    config = os.path.join(JM_PATH, 'sftp.yml')
-    with open(config, "r", encoding="utf8") as f:
-        data = yaml.load(f, Loader=yaml.FullLoader)
-        sftp = data['sftp']
-    ssh_client = paramiko.SSHClient()
-    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh_client.connect(hostname=sftp['host'], port=22, username=sftp['name'], password=sftp['password'])
-    sftp_client = ssh_client.open_sftp()
     listdir = os.listdir(pdf_dir)
     for pdf_path in listdir:
-        transmission_one(os.path.join(pdf_dir, pdf_path), sftp_client)
-    sftp_client.close()
-    ssh_client.close()
+        transmission_one(os.path.join(pdf_dir, pdf_path))
 
 
 def transmission_one(pdf_dir: str, sftp_client=None):
