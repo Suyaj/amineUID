@@ -40,9 +40,10 @@ async def download(bot: Bot, ev: Event):
 async def trans(bot: Bot, ev: Event):
     texts = ev.text.strip().split(" ")
     search_content = texts[0]
+    user_id = ev.user_id
     search_path = Path.joinpath(JM_PATH, search_content)
     transmission(search_path)
-    http_bot.send_private_msg(ev.user_id, ["传输成功", f"访问地址：{BASE_HTTP}"])
+    http_bot.send_private_msg(user_id, ["传输成功", f"访问地址：{BASE_HTTP}"])
 
 
 @sv_wiki.on_prefix("搜索")
