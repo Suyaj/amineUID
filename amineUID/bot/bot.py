@@ -17,7 +17,7 @@ class HttpClient:
 
             self.sp_msg = '/send_private_forward_msg'
 
-    def send_private_msg(self, user_id: str, _type: str, msgs: list[str]):
+    def send_private_msg(self, user_id: str, msgs: list[str]):
         message_list = []
         news = []
         for msg in msgs:
@@ -43,4 +43,4 @@ class HttpClient:
 
     def __request(self, url, head, raw):
         _url = f'http://{self.host}:{self.port}{url}'
-        return requests.post(_url, headers=head, raw=raw)
+        return requests.post(_url, headers=head, json=raw)
