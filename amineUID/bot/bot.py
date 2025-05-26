@@ -34,7 +34,7 @@ class HttpClient:
                 ]
             }})
             news.append({
-                'text': 'msg'
+                'text': msg
             })
 
         raw = {"user_id": user_id, "message": message_list, 'source': self.user_name, 'news': news}
