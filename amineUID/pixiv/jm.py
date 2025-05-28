@@ -100,12 +100,14 @@ def get_album(album_id, pdf_dir=None):
 
 def transmission(user_id, pdf_dir: str):
     listdir = os.listdir(pdf_dir)
+    flag = True
     for pdf_path in listdir:
         try:
             transmission_one(os.path.join(pdf_dir, pdf_path))
         except:
+            flag = False
             http_bot.send_private_msg(user_id, [f'传输失败{pdf_path}'])
-    if os.path.exists(pdf_dir):
+    if os.path.exists(pdf_dir) and flag:
         os.removedirs(pdf_dir)
 
 
