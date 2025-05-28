@@ -6,6 +6,7 @@ import paramiko
 from jmcomic import ZipPlugin, JmModuleConfig, Img2pdfPlugin, JmPhotoDetail, JmAlbumDetail, jm_log, DirRule, JmOption, \
     JmSearchPage
 
+from amineUID.bot import http_bot
 from gsuid_core.logger import logger
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import JM_PATH
 
@@ -97,10 +98,13 @@ def get_album(album_id, pdf_dir=None):
                 return album
 
 
-def transmission(pdf_dir: str):
+def transmission(user_id, pdf_dir: str):
     listdir = os.listdir(pdf_dir)
     for pdf_path in listdir:
-        transmission_one(os.path.join(pdf_dir, pdf_path))
+        try:
+            transmission_one(os.path.join(pdf_dir, pdf_path))
+        except:
+            http_bot.send_private_msg(user_id, [f'传输失败{pdf_path}'])
     if os.path.exists(pdf_dir):
         os.removedirs(pdf_dir)
 

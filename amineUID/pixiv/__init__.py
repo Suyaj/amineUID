@@ -42,7 +42,7 @@ async def trans(bot: Bot, ev: Event):
     search_content = texts[0]
     user_id = ev.user_id
     search_path = Path.joinpath(JM_PATH, search_content)
-    transmission(search_path)
+    transmission(user_id, search_path)
     http_bot.send_private_msg(user_id, ["传输成功", f"访问地址：{BASE_HTTP}"])
 
 
@@ -74,7 +74,7 @@ async def search(bot: Bot, ev: Event):
                 album = contents.getindex(i)
                 album_id = album[0]
                 get_album(album_id, str(search_path))
-            transmission(search_path)
+            transmission(user_id, search_path)
             http_bot.send_private_msg(user_id, ["传输成功", f"访问地址：{BASE_HTTP}"])
         else:
             album = contents.getindex(int(index))
