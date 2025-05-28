@@ -48,6 +48,7 @@ async def trans(bot: Bot, ev: Event):
 
 @sv_wiki.on_prefix("搜索")
 async def search(bot: Bot, ev: Event):
+    user_id = ev.user_id
     texts = ev.text.strip().split(" ")
     search_content = texts[0]
     page = 1
@@ -74,10 +75,10 @@ async def search(bot: Bot, ev: Event):
                 album_id = album[0]
                 get_album(album_id, str(search_path))
             transmission(search_path)
-            await bot.send(["获取成功", f"访问地址：{BASE_HTTP}"])
+            http_bot.send_private_msg(user_id, ["传输成功", f"访问地址：{BASE_HTTP}"])
         else:
             album = contents.getindex(int(index))
             album_id, album_name = album
             album = get_album(album_id)
             transmission_one(Path.joinpath(JM_PATH, album.name))
-            await bot.send(["获取成功", f"访问地址：{BASE_HTTP}"])
+            http_bot.send_private_msg(user_id, ["传输成功", f"访问地址：{BASE_HTTP}"])
