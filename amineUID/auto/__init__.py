@@ -1,23 +1,37 @@
-import os
-from concurrent.futures.thread import ThreadPoolExecutor
-
-from gsuid_core.gss import gss
+from ZZZeroUID.utils.hint import BIND_UID_HINT
+from gsuid_core.plugins.amineUID.amineUID.bot import http_bot
+from gsuid_core.aps import scheduler
 from gsuid_core.logger import logger
 from gsuid_core.config import core_config
-import gsuid_core.plugins.amineUID.amineUID.cos as cos
+from gsuid_core.utils.database.models import GsBind
 
 
-# @scheduler.scheduled_job('cron', hour=0)
-async def get_cos_job():
-    logger.info("开始刷新cos列表")
-    cos_list = cos.get_cos_list()
-    with ThreadPoolExecutor(max_workers=os.cpu_count(), thread_name_prefix='COS_THREAD_') as executor:
-        for item in cos_list.items():
-            executor.submit(cos.async_get_cos, item[0], item[1])
-        executor.shutdown()
+@scheduler.scheduled_job('cron', minute='*/5')
+async def sign_in():
+    logger.info("开始签到")
     masters = core_config.get_config('masters')
-    for bot_id in gss.active_bot:
-        bot = gss.active_bot[bot_id]
-        for master in masters:
-            await bot.target_send("cos列表刷新成功", "direct", master, 'onebot', bot_id)
-    logger.info("刷新cos列表完成")
+    for master in masters:
+        msg_list = []
+        uid = await GsBind.get_uid_by_game(master, "3490728073")
+        if uid is None:
+            msg_list.append("你还没有绑定UID哦, 请使用原神绑定uid 完成绑定！")
+        else:
+            # gs签到
+            msg = await sign_in(uid, 'gs')
+            msg_list.append(msg)
+        # sr签到
+        uid = await GsBind.get_uid_by_game(master, "3490728073", 'sr')
+        if uid is None:
+            msg_list.append("你还没有绑定UID哦, 请使用崩铁绑定uid 完成绑定！")
+        else:
+            msg = await sign_in(uid, 'sr')
+            msg_list.append(msg)
+        # zzz签到
+        uid = await GsBind.get_uid_by_game(master, "3490728073", 'zzz')
+        if uid is None:
+            msg_list.append(BIND_UID_HINT)
+        else:
+            msg = await sign_in(uid, 'zzz')
+            msg_list.append(msg)
+        http_bot.send_private_msg(master, msg_list)
+    logger.info("签到结束")
