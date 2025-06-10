@@ -7,7 +7,7 @@ from gsuid_core.utils.database.models import GsBind
 import gsuid_core.utils.sign.sign as sign
 
 
-@scheduler.scheduled_job('cron', hour=16, minute=43)
+@scheduler.scheduled_job('cron', hour=1, minute=0)
 async def sign_in():
     logger.info("开始签到")
     masters = core_config.get_config('masters')
