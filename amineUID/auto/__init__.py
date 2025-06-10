@@ -1,4 +1,4 @@
-from ZZZeroUID.utils.hint import BIND_UID_HINT
+from gsuid_core.plugins.ZZZeroUID.ZZZeroUID.utils.hint import BIND_UID_HINT
 from gsuid_core.plugins.amineUID.amineUID.bot import http_bot
 from gsuid_core.aps import scheduler
 from gsuid_core.logger import logger
