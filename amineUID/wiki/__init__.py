@@ -21,7 +21,7 @@ sv_wiki = SV("wiki")
 
 @sv_wiki.on_fullmatch("全部签到")
 async def get_all_sign_func(bot: Bot, ev: Event):
-    logger.info(f'[全部签到] 用户: {ev.user_id}')
+    logger.info(f'[全部签到] 用户: {ev.user_id} bot:{ev.bot_id}')
     uid = await GsBind.get_uid_by_game(ev.user_id, ev.bot_id)
     if uid is None:
         return await bot.send("你还没有绑定UID哦, 请使用 原神绑定uid 完成绑定！")

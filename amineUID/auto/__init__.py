@@ -14,7 +14,7 @@ async def sign_in():
         msg_list = []
         uid = await GsBind.get_uid_by_game(master, "3490728073")
         if uid is None:
-            msg_list.append("你还没有绑定UID哦, 请使用原神绑定uid 完成绑定！")
+            msg_list.append(f"[{master}]你还没有绑定UID哦, 请使用原神绑定uid 完成绑定！")
         else:
             # gs签到
             msg = await sign_in(uid, 'gs')
@@ -22,14 +22,14 @@ async def sign_in():
         # sr签到
         uid = await GsBind.get_uid_by_game(master, "3490728073", 'sr')
         if uid is None:
-            msg_list.append("你还没有绑定UID哦, 请使用崩铁绑定uid 完成绑定！")
+            msg_list.append(f"[{master}]你还没有绑定UID哦, 请使用崩铁绑定uid 完成绑定！")
         else:
             msg = await sign_in(uid, 'sr')
             msg_list.append(msg)
         # zzz签到
         uid = await GsBind.get_uid_by_game(master, "3490728073", 'zzz')
         if uid is None:
-            msg_list.append(BIND_UID_HINT)
+            msg_list.append(f"[{master}]{BIND_UID_HINT}")
         else:
             msg = await sign_in(uid, 'zzz')
             msg_list.append(msg)
