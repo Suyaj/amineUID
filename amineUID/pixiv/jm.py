@@ -1,4 +1,5 @@
 import base64
+import shutil
 import tempfile
 
 import jmcomic, os, yaml
@@ -10,7 +11,7 @@ from amineUID.bot import http_bot
 from gsuid_core.logger import logger
 from gsuid_core.plugins.amineUID.amineUID.utils.contants import JM_PATH
 
-SFTP_PATH = '/home/calibre/autoaddbooks'
+SFTP_PATH = '/home/calibre/auto'
 
 
 class ZipEnhancedPlugin(ZipPlugin):
@@ -112,28 +113,29 @@ def transmission(user_id, pdf_dir: str):
 
 
 def transmission_one(pdf_dir: str, sftp_client=None):
-    config = os.path.join(JM_PATH, 'sftp.yml')
-    with open(config, "r", encoding="utf8") as f:
-        data = yaml.load(f, Loader=yaml.FullLoader)
-        sftp = data['sftp']
-    sftp_exist = sftp_client is None
-    ssh_client = None
-    if sftp_exist:
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname=sftp['host'], port=22, username=sftp['name'], password=sftp['password'])
-        sftp_client = ssh_client.open_sftp()
+    # config = os.path.join(JM_PATH, 'sftp.yml')
+    # with open(config, "r", encoding="utf8") as f:
+        # data = yaml.load(f, Loader=yaml.FullLoader)
+        # sftp = data['sftp']
+    # sftp_exist = sftp_client is None
+    # ssh_client = None
+    # if sftp_exist:
+    #     ssh_client = paramiko.SSHClient()
+    #     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    #     ssh_client.connect(hostname=sftp['host'], port=22, username=sftp['name'], password=sftp['password'])
+    #     sftp_client = ssh_client.open_sftp()
     listdir = os.listdir(pdf_dir)
     for file in listdir:
         file_path = os.path.join(pdf_dir, file)
         logger.info(f"传输文件{file_path}")
-        sftp_client.put(file_path, os.path.join(SFTP_PATH, file))
-        os.remove(file_path)
+        shutil.move(file_path, os.path.join(SFTP_PATH, file))
+        # sftp_client.put(file_path, os.path.join(SFTP_PATH, file))
+        # os.remove(file_path)
     os.removedirs(pdf_dir)
-    if sftp_exist:
-        sftp_client.close()
-        if sftp_client is not None:
-            ssh_client.close()
+    # if sftp_exist:
+    #     sftp_client.close()
+    #     if sftp_client is not None:
+    #         ssh_client.close()
 
 
 def file_to_base64(file_path):
