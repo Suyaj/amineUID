@@ -150,7 +150,7 @@ def file_to_base64(file_path):
 
 
 def search(title: str, page: int = 1) -> JmSearchPage:
-    client = JmOption.default().new_jm_client()
+    client = JmOption.from_file(os.path.join(JM_PATH, 'option.yml')).new_jm_client()
     page: JmSearchPage = client.search_site(search_query=title, page=page)
     return page
 
