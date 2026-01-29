@@ -11,7 +11,7 @@ import gsuid_core.utils.sign.sign as sign
 @scheduler.scheduled_job('cron', hour=1, minute=0)
 async def sign_in():
     logger.info("开始签到")
-    masters = core_config.get_config('masters')
+    masters = core_config.get_config("sign_user")
     for master in masters:
         msg_list = []
         uid = await GsBind.get_uid_by_game(master, "onebot")
