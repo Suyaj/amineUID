@@ -51,14 +51,14 @@ async def get_all_sign_func(bot: Bot, ev: Event):
     if uid is None:
         return await bot.send(BIND_UID_HINT)
     await bot.send(await sign_in(uid, 'zzz'))
-    return await ww_sign(bot, ev)
+    return await bot.send(await ww_sign(ev.user_id, ev.bot_id))
 
 
-async def ww_sign(bot, ev):
+async def ww_sign(user_id, bot_id):
     # ww签到
-    bind_data = await WavesBind.select_data(ev.user_id, ev.bot_id)
+    bind_data = await WavesBind.select_data(user_id, bot_id)
     if not bind_data:
-        return await bot.send(f"鸣潮{WAVES_CODE_101_MSG}")
+        return f"鸣潮{WAVES_CODE_101_MSG}";
     # 获取所有 UID
     waves_uid_list = []
     if bind_data.uid:
@@ -67,8 +67,8 @@ async def ww_sign(bot, ev):
         for waves_uid in waves_uid_list:
             await WavesUser.update_last_used_time(
                 waves_uid,
-                ev.user_id,
-                ev.bot_id,
+                user_id,
+                bot_id,
                 game_id=WAVES_GAME_ID,
             )
     main_uid = waves_uid_list[0] if waves_uid_list else None
@@ -109,15 +109,15 @@ async def ww_sign(bot, ev):
     main_token = None
     sign_status = get_sign_status()
     if main_uid:
-        main_token = await rover_api.get_self_waves_ck(main_uid, ev.user_id, ev.bot_id)
+        main_token = await rover_api.get_self_waves_ck(main_uid, user_id, bot_id)
         if not main_token:
             expire_uid.add(main_uid)
     # 鸣潮签到
     if waves_enabled and waves_uid_list:
         for waves_uid in waves_uid_list:
             token = main_token if waves_uid == main_uid else await rover_api.get_self_waves_ck(waves_uid,
-                                                                                               ev.user_id,
-                                                                                               ev.bot_id)
+                                                                                               user_id,
+                                                                                               bot_id)
             if not token:
                 expire_uid.add(waves_uid)
                 continue
