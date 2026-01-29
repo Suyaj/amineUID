@@ -58,7 +58,7 @@ async def ww_sign(user_id, bot_id):
     # ww签到
     bind_data = await WavesBind.select_data(user_id, bot_id)
     if not bind_data:
-        return f"鸣潮{WAVES_CODE_101_MSG}";
+        return f"鸣潮{WAVES_CODE_101_MSG}"
     # 获取所有 UID
     waves_uid_list = []
     if bind_data.uid:
