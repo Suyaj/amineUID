@@ -1,3 +1,4 @@
+from amineUID.wiki import ww_sign
 from gsuid_core.plugins.ZZZeroUID.ZZZeroUID.utils.hint import BIND_UID_HINT
 from gsuid_core.plugins.amineUID.amineUID.bot import http_bot
 from gsuid_core.aps import scheduler
@@ -35,4 +36,5 @@ async def sign_in():
             msg = await sign.sign_in(uid, 'zzz')
             msg_list.append(msg)
         http_bot.send_private_msg(master, msg_list)
+        await ww_sign(master, "onebot")
     logger.info("签到结束")
