@@ -13,7 +13,7 @@ packages = [
 python = ">=3.11,<4.0"
 beautifulsoup4 = "4.12.3"
 requests = "^2.32.3"
-pillow = ">=10.2.0"
+pillow = ">=11.3.0"
 playwright = "^1.51.0"
 pixivpy3 = "^3.7.5"
 jmcomic = "^2.5.34"
